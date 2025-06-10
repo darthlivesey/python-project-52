@@ -7,7 +7,7 @@ build:
 	./build.sh
 
 render-start:
-	gunicorn task_manager.wsgi
+    gunicorn src.wsgi
 
 migrate:
 	python manage.py migrate

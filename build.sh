@@ -1,15 +1,24 @@
-#!/usr/bin/env bash
+#!/bin/bash
+set -x  # Режим отладки
 
+# Установка uv
 curl -LsSf https://astral.sh/uv/install.sh | sh
-source $HOME/.cargo/env
 export PATH="$HOME/.local/bin:$PATH"
 
-# Явная установка gunicorn
-/opt/render/.local/bin/uv pip install gunicorn
+echo "### Python version: $(python --version)"
+echo "### UV version: $(uv --version)"
 
 # Установка зависимостей
-/opt/render/.local/bin/uv pip install -e .
+uv pip install --python=python .
 
+# Проверка установки Django
+echo "### Installed Django:"
+python -c "import django; print(django.__version__)"
+
+# Применение миграций
 python manage.py migrate
 
-python manage.py collectstatic --noinput
+# Сборка статики
+python manage.py collectstatic --noinput --clear
+
+echo "### Build completed successfully ###"

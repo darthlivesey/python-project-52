@@ -1,9 +1,15 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 curl -LsSf https://astral.sh/uv/install.sh | sh
 source $HOME/.cargo/env
+export PATH="$HOME/.local/bin:$PATH"
 
-source $HOME/.local/bin/activate
+# Явная установка gunicorn
+/opt/render/.local/bin/uv pip install gunicorn
 
-make install
-make migrate
-make collectstatic
+# Установка зависимостей
+/opt/render/.local/bin/uv pip install -e .
+
+python manage.py migrate
+
+python manage.py collectstatic --noinput

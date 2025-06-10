@@ -8,8 +8,12 @@ from django.shortcuts import redirect
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from django.contrib.auth import get_user_model
 from django.contrib import messages
+from django.shortcuts import render
 
 User = get_user_model()
+
+def index(request):
+    return render(request, 'index.html')
 
 class UserListView(ListView):
     model = User

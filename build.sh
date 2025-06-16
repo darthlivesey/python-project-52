@@ -12,7 +12,10 @@ source .venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
 
-# Применить миграции (с правильным путем к manage.py)
+# Установить правильный PYTHONPATH
+export PYTHONPATH="${PYTHONPATH}:/opt/render/project/src"
+
+# Применить миграции
 python src/manage.py migrate
 
 # Собрать статику

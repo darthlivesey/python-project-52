@@ -91,10 +91,10 @@ class CustomLoginView(SuccessMessageMixin, LoginView):
     template_name = 'registration/login.html'
     success_message = "Вы успешно вошли в систему!"
 
-    def custom_logout(request):
-        logout(request)
-        messages.success(request, "Вы успешно вышли из системы!")
-        return redirect('home')
+def custom_logout(request):
+    logout(request)
+    messages.success(request, "Вы успешно вышли из системы!")
+    return redirect('home')
 
 class TaskListView(LoginRequiredMixin, ListView):
     model = Task

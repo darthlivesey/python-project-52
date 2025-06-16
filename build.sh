@@ -1,15 +1,18 @@
 #!/bin/bash
-set -e  # Прерывать при ошибках
+set -e
+
+# Явно указать Python 3.10
+export PATH="/opt/render/project/python/Python-3.10.18/bin:$PATH"
+
+# Установить uv локально
+python -m pip install --user uv==0.7.13
+export PATH="$HOME/.local/bin:$PATH"
 
 # Создать виртуальное окружение
 python -m venv .venv
 source .venv/bin/activate
 
-# Установить UV
-curl -LsSf https://astral.sh/uv/install.sh | sh
-export PATH="$HOME/.cargo/bin:$PATH"
-
-# Установить зависимости в виртуальное окружение
+# Установить зависимости
 uv pip install --python=python .
 
 # Применить миграции
@@ -17,3 +20,5 @@ python manage.py migrate
 
 # Собрать статику
 python manage.py collectstatic --noinput --clear
+
+echo "### Build completed successfully ###"

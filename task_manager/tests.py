@@ -1,5 +1,6 @@
 from django.test import TestCase
-
+from .models import Status
+from .forms import StatusForm
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
@@ -62,3 +63,41 @@ class UserViewsTest(TestCase):
         response = self.client.get(reverse('logout'))
         self.assertEqual(response.status_code, 302)
         self.assertFalse('_auth_user_id' in self.client.session)
+
+class StatusViewsTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.status = Status.objects.create(name='Test Status')
+    
+    def test_status_list_requires_login(self):
+        response = self.client.get(reverse('statuses_list'))
+        self.assertRedirects(response, '/login/?next=/statuses/')
+    
+    def test_status_create(self):
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.post(reverse('status_create'), {'name': 'New Status'})
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Status.objects.filter(name='New Status').exists())
+
+    def test_status_update(self):
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.post(
+            reverse('status_update', args=[self.status.pk]),
+            {'name': 'Updated Status'}
+        )
+        self.assertEqual(response.status_code, 302)
+        self.status.refresh_from_db()
+        self.assertEqual(self.status.name, 'Updated Status')
+
+    def test_status_delete(self):
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.post(reverse('status_delete', args=[self.status.pk]))
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(Status.objects.filter(pk=self.status.pk).exists())
+
+    def test_status_delete_protected(self):
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.post(reverse('status_delete', args=[self.status.pk]))
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Status.objects.filter(pk=self.status.pk).exists())

@@ -1,4 +1,4 @@
-{% load bootstrap5 %}
+{% load django_bootstrap5 %}
 {% load i18n %}
 <!DOCTYPE html>
 <html lang="ru">
@@ -20,6 +20,9 @@
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'users_list' %}">{% trans "Users" %}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'statuses_list' %}">{% trans "Statuses" %}</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav ms-auto">

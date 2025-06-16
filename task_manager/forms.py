@@ -1,8 +1,21 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
+from .models import Status
 
 User = get_user_model()
+
+class StatusForm(forms.ModelForm):
+    class Meta:
+        model = Status
+        fields = ['name']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+        labels = {
+            'name': _('Name')
+        }
 
 class CustomUserCreationForm(UserCreationForm):
     class Meta:

@@ -9,11 +9,47 @@ from .forms import CustomUserCreationForm, CustomUserChangeForm
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.shortcuts import render
+from .models import Status
+from .forms import StatusForm
+from django.utils.translation import gettext as _
 
 User = get_user_model()
 
 def index(request):
     return render(request, 'index.html')
+
+class StatusListView(LoginRequiredMixin, SuccessMessageMixin, ListView):
+    model = Status
+    template_name = 'statuses/statuses_list.html'
+    context_object_name = 'statuses'
+
+class StatusCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+    model = Status
+    form_class = StatusForm
+    template_name = 'statuses/status_form.html'
+    success_url = reverse_lazy('statuses_list')
+    success_message = _("Статус успешно создан")
+
+class StatusUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+    model = Status
+    form_class = StatusForm
+    template_name = 'statuses/status_form.html'
+    success_url = reverse_lazy('statuses_list')
+    success_message = _("Статус успешно изменен")
+
+class StatusDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
+    model = Status
+    template_name = 'statuses/status_confirm_delete.html'
+    success_url = reverse_lazy('statuses_list')
+    success_message = _("Статус успешно удален")
+    
+    # Защита от удаления используемых статусов
+    def post(self, request, *args, **kwargs):
+        status = self.get_object()
+        if status.task_set.exists():  # Проверка связи с задачами
+            messages.error(request, _("Невозможно удалить статус, используемый в задачах"))
+            return redirect('statuses_list')
+        return super().post(request, *args, **kwargs)
 
 class UserListView(ListView):
     model = User

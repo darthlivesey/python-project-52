@@ -1,6 +1,8 @@
 from django.test import TestCase
 from .models import Status
 from .forms import StatusForm
+from .models import Task
+from .forms import TaskForm
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
@@ -101,3 +103,52 @@ class StatusViewsTest(TestCase):
         response = self.client.post(reverse('status_delete', args=[self.status.pk]))
         self.assertEqual(response.status_code, 302)
         self.assertTrue(Status.objects.filter(pk=self.status.pk).exists())
+
+class TaskViewsTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.status = Status.objects.create(name='Test Status')
+        self.task = Task.objects.create(
+            name='Test Task',
+            description='Test Description',
+            status=self.status,
+            creator=self.user
+        )
+
+    def test_task_list_requires_login(self):
+        response = self.client.get(reverse('tasks_list'))
+        self.assertRedirects(response, '/login/?next=/tasks/')
+
+    def test_task_create(self):
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.post(reverse('task_create'), {
+            'name': 'New Task',
+            'description': 'New Description',
+            'status': self.status.pk,
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Task.objects.filter(name='New Task').exists())
+
+    def test_task_update(self):
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.post(
+            reverse('task_update', args=[self.task.pk]),
+            {'name': 'Updated Task'}
+        )
+        self.assertEqual(response.status_code, 302)
+        self.task.refresh_from_db()
+        self.assertEqual(self.task.name, 'Updated Task')
+
+    def test_task_delete(self):
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.post(reverse('task_delete', args=[self.task.pk]))
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(Task.objects.filter(pk=self.task.pk).exists())
+
+    def test_task_delete_only_by_creator(self):
+        another_user = User.objects.create_user(username='anotheruser', password='testpass')
+        self.client.login(username='anotheruser', password='testpass')
+        response = self.client.post(reverse('task_delete', args=[self.task.pk]))
+        self.assertEqual(response.status_code, 403)
+        self.assertTrue(Task.objects.filter(pk=self.task.pk).exists())

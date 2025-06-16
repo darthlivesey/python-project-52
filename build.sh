@@ -6,21 +6,21 @@ export PATH="/opt/render/project/python/Python-3.10.18/bin:$PATH"
 
 # Создать виртуальное окружение
 python -m venv .venv
+
+# Активировать окружение
 source .venv/bin/activate
 
-# Установить uv
-pip install uv==0.7.13
+# Установить зависимости с помощью pip
+pip install --upgrade pip
+pip install -r requirements.txt
 
-# Установить зависимости проекта
-uv pip install -r requirements.txt
+# Установить пути
+export PYTHONPATH="${PYTHONPATH}:/opt/render/project/src"
 
-# Активировать окружение для последующих команд
-source .venv/bin/activate
-
-# Применить миграции
-python manage.py migrate
+# Применить миграции (используя Python из виртуального окружения)
+.venv/bin/python manage.py migrate
 
 # Собрать статику
-python manage.py collectstatic --noinput --clear
+.venv/bin/python manage.py collectstatic --noinput --clear
 
 echo "### Build completed successfully ###"

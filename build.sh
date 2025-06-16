@@ -8,14 +8,19 @@ export PATH="/opt/render/project/python/Python-3.10.18/bin:$PATH"
 python -m venv .venv
 source .venv/bin/activate
 
-# Установить uv ЛОКАЛЬНО в venv (ключевое исправление!)
+# Установить uv
 pip install uv==0.7.13
 
-# Установить зависимости проекта через uv
-uv pip install -r requirements.txt  # Используем requirements.txt
+# Установить зависимости проекта
+uv pip install -r requirements.txt
+
+# Активировать окружение для последующих команд
+source .venv/bin/activate
 
 # Применить миграции
 python manage.py migrate
 
 # Собрать статику
 python manage.py collectstatic --noinput --clear
+
+echo "### Build completed successfully ###"

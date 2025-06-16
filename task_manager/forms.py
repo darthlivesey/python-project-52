@@ -40,6 +40,17 @@ class CustomUserChangeForm(UserChangeForm):
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
         }
 
+class LabelForm(forms.ModelForm):
+    class Meta:
+        model = Label
+        fields = ['name']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+        labels = {
+            'name': _('Name')
+        }
+
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
@@ -49,10 +60,12 @@ class TaskForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'status': forms.Select(attrs={'class': 'form-control'}),
             'executor': forms.Select(attrs={'class': 'form-control'}),
+            'labels': forms.SelectMultiple(attrs={'class': 'form-control'}),
         }
         labels = {
             'name': 'Название',
             'description': 'Описание',
             'status': 'Статус',
             'executor': 'Исполнитель',
+            'labels': 'Метки',
         }

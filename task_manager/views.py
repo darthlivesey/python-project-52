@@ -9,11 +9,9 @@ from .forms import CustomUserCreationForm, CustomUserChangeForm
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.shortcuts import render
-from .models import Status
-from .forms import StatusForm
+from .models import Status, Task, Label
+from .forms import StatusForm, TaskForm, LabelForm
 from django.utils.translation import gettext as _
-from .models import Task
-from .forms import TaskForm
 
 User = get_user_model()
 
@@ -132,3 +130,35 @@ class TaskDeleteView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixi
 
     def test_func(self):
         return self.request.user == self.get_object().creator
+    
+class LabelListView(LoginRequiredMixin, ListView):
+    model = Label
+    template_name = 'labels/label_list.html'
+    context_object_name = 'labels'
+
+class LabelCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+    model = Label
+    form_class = LabelForm
+    template_name = 'labels/label_form.html'
+    success_url = reverse_lazy('labels_list')
+    success_message = _("Метка успешно создана")
+
+class LabelUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+    model = Label
+    form_class = LabelForm
+    template_name = 'labels/label_form.html'
+    success_url = reverse_lazy('labels_list')
+    success_message = _("Метка успешно изменена")
+
+class LabelDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
+    model = Label
+    template_name = 'labels/label_confirm_delete.html'
+    success_url = reverse_lazy('labels_list')
+    success_message = _("Метка успешно удалена")
+    
+    def post(self, request, *args, **kwargs):
+        label = self.get_object()
+        if label.tasks.exists():
+            messages.error(request, _("Невозможно удалить метку, используемую в задачах"))
+            return redirect('labels_list')
+        return super().post(request, *args, **kwargs)

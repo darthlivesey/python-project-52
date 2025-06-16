@@ -1,8 +1,5 @@
 from django.test import TestCase
-from .models import Status
-from .forms import StatusForm
-from .models import Task
-from .forms import TaskForm
+from .models import Status, Task, Label
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
@@ -152,3 +149,36 @@ class TaskViewsTest(TestCase):
         response = self.client.post(reverse('task_delete', args=[self.task.pk]))
         self.assertEqual(response.status_code, 403)
         self.assertTrue(Task.objects.filter(pk=self.task.pk).exists())
+
+class LabelViewsTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.label = Label.objects.create(name='Test Label')
+        self.task = Task.objects.create(
+            name='Test Task',
+            description='Test Description',
+            status=Status.objects.create(name='Test Status'),
+            creator=self.user
+        )
+    
+    def test_label_list_requires_login(self):
+        response = self.client.get(reverse('labels_list'))
+        self.assertRedirects(response, '/login/?next=/labels/')
+    
+    def test_label_create(self):
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.post(reverse('label_create'), {'name': 'New Label'})
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Label.objects.filter(name='New Label').exists())
+
+    def test_label_delete_protected(self):
+        self.task.labels.add(self.label)
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.post(reverse('label_delete', args=[self.label.pk]))
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Label.objects.filter(pk=self.label.pk).exists())
+        self.assertIn(
+            "Невозможно удалить метку, используемую в задачах",
+            [msg.message for msg in response.wsgi_request._messages]
+        )

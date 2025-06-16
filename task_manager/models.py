@@ -10,6 +10,13 @@ class Status(models.Model):
     def __str__(self):
         return self.name
 
+class Label(models.Model):
+    name = models.CharField(max_length=100, unique=True, verbose_name="Название")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+
+    def __str__(self):
+        return self.name
+
 class Task(models.Model):
     name = models.CharField(max_length=100, verbose_name="Название")
     description = models.TextField(blank=True, verbose_name="Описание")
@@ -18,6 +25,12 @@ class Task(models.Model):
     executor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, 
                                 related_name='assigned_tasks', verbose_name="Исполнитель")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    labels = models.ManyToManyField(
+        Label,
+        blank=True,
+        related_name='tasks',
+        verbose_name="Метки"
+    )
 
     def __str__(self):
         return self.name

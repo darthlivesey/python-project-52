@@ -5,8 +5,8 @@ set -e
 export PATH="/opt/render/project/python/Python-3.10.18/bin:$PATH"
 
 # Установка gettext для компиляции переводов
-sudo apt-get update
-sudo apt-get install -y gettext
+apt-get update
+apt-get install -y gettext
 
 # Создать виртуальное окружение
 python -m venv .venv

@@ -1,25 +1,27 @@
 #!/bin/bash
 set -e
 
-# Используем UV для установки зависимостей из requirements.txt
 echo "### Installing dependencies with UV ###"
 uv pip install -r requirements.txt
 
 # Добавляем путь к пакетам Python в PYTHONPATH
 export PYTHONPATH="${PYTHONPATH}:/opt/render/project/python/Python-${PYTHON_VERSION}/lib/python3.10/site-packages"
 
-# Переходим в директорию src, где находится manage.py
+# Устанавливаем PYTHONPATH так, чтобы он включал корень проекта
+export PYTHONPATH="${PYTHONPATH}:$(pwd)/src"
+
+# Явно указываем модуль настроек (без префикса пакета)
+export DJANGO_SETTINGS_MODULE="settings"
+
+# Переходим в директорию src, где находится manage.py и settings.py
 cd src
 
-# Компиляция переводов
 echo "### Compiling translations ###"
 python manage.py compilemessages
 
-# Применение миграций
 echo "### Applying migrations ###"
 python manage.py migrate
 
-# Сбор статики
 echo "### Collecting static files ###"
 python manage.py collectstatic --noinput --clear
 

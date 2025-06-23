@@ -16,6 +16,15 @@ export DJANGO_SETTINGS_MODULE="settings"
 # Переходим в директорию src, где находится manage.py и settings.py
 cd src
 
+echo "### Debug: Current directory ###"
+pwd
+echo "### Debug: Directory contents ###"
+ls -la
+echo "### Debug: PYTHONPATH ###"
+echo $PYTHONPATH
+echo "### Debug: Django settings module ###"
+echo $DJANGO_SETTINGS_MODULE
+
 echo "### Compiling translations ###"
 python manage.py compilemessages
 

@@ -4,15 +4,26 @@ set -e
 echo "### Installing dependencies with UV ###"
 uv pip install -r requirements.txt
 
-# Создаем временный manage.py в корне проекта
-MAIN_DIR="/opt/render/project/src"
-echo "import sys" > ${MAIN_DIR}/manage.py
-echo "from src.manage import main" >> ${MAIN_DIR}/manage.py
-echo "if __name__ == '__main__':" >> ${MAIN_DIR}/manage.py
-echo "    main()" >> ${MAIN_DIR}/manage.py
+# Основная директория проекта
+PROJECT_DIR="/opt/render/project/src"
 
-# Переходим в корень проекта
-cd ${MAIN_DIR}
+# Добавляем пути в PYTHONPATH
+export PYTHONPATH="${PYTHONPATH}:${PROJECT_DIR}/src:/opt/render/project/python/Python-${PYTHON_VERSION}/lib/python3.10/site-packages"
+
+# Устанавливаем модуль настроек
+export DJANGO_SETTINGS_MODULE="settings"
+
+# Переходим в директорию с настройками
+cd ${PROJECT_DIR}/src
+
+echo "### Debug: Current directory ###"
+pwd
+echo "### Debug: Directory contents ###"
+ls -la
+echo "### Debug: PYTHONPATH ###"
+echo $PYTHONPATH
+echo "### Debug: Django settings module ###"
+echo $DJANGO_SETTINGS_MODULE
 
 echo "### Compiling translations ###"
 python manage.py compilemessages

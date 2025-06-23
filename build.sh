@@ -5,19 +5,22 @@ set -e
 echo "### Installing dependencies with UV ###"
 uv pip install -r requirements.txt
 
-# Добавляем путь к Python в PYTHONPATH
+# Добавляем путь к пакетам Python в PYTHONPATH
 export PYTHONPATH="${PYTHONPATH}:/opt/render/project/python/Python-${PYTHON_VERSION}/lib/python3.10/site-packages"
+
+# Переходим в директорию src, где находится manage.py
+cd src
 
 # Компиляция переводов
 echo "### Compiling translations ###"
-python src/manage.py compilemessages
+python manage.py compilemessages
 
 # Применение миграций
 echo "### Applying migrations ###"
-python src/manage.py migrate
+python manage.py migrate
 
 # Сбор статики
 echo "### Collecting static files ###"
-python src/manage.py collectstatic --noinput --clear
+python manage.py collectstatic --noinput --clear
 
 echo "### Build completed successfully ###"

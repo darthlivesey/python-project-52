@@ -1,11 +1,22 @@
 from django.test import TestCase
 from .models import Status, Task, Label
-from django.test import TestCase, Client
+from django.test import TestCase, Client, override_settings
 from django.urls import reverse
+from django.utils.translation import activate
 from django.contrib.auth import get_user_model
 from .forms import CustomUserCreationForm
+from django.conf import settings
 
 User = get_user_model()
+
+class LocalizationTest(TestCase):
+    def setUp(self):
+        from django.utils.translation import activate
+        activate('ru')
+    
+    def test_russian_translation(self):
+        from django.utils.translation import gettext as _
+        self.assertEqual(_("Task Manager"), "Менеджер задач")
 
 class UserViewsTest(TestCase):
     def setUp(self):
@@ -96,10 +107,21 @@ class StatusViewsTest(TestCase):
         self.assertFalse(Status.objects.filter(pk=self.status.pk).exists())
 
     def test_status_delete_protected(self):
+        Task.objects.create(
+            name='Protected Task',
+            description='Task using status',
+            status=self.status,
+            creator=self.user
+        )
+        
         self.client.login(username='testuser', password='testpass')
         response = self.client.post(reverse('status_delete', args=[self.status.pk]))
         self.assertEqual(response.status_code, 302)
         self.assertTrue(Status.objects.filter(pk=self.status.pk).exists())
+        self.assertIn(
+            "Невозможно удалить статус, используемый в задачах",
+            [msg.message for msg in response.wsgi_request._messages]
+        )
 
 class TaskViewsTest(TestCase):
     def setUp(self):
@@ -131,7 +153,12 @@ class TaskViewsTest(TestCase):
         self.client.login(username='testuser', password='testpass')
         response = self.client.post(
             reverse('task_update', args=[self.task.pk]),
-            {'name': 'Updated Task'}
+            {
+                'name': 'Updated Task',
+                'description': 'Updated Description',
+                'status': self.status.pk,
+                'executor': self.user.pk,
+            }
         )
         self.assertEqual(response.status_code, 302)
         self.task.refresh_from_db()
@@ -154,7 +181,7 @@ class LabelViewsTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user(username='testuser', password='testpass')
-        self.label = Label.objects.create(name='Test Label')
+        self.label = Label.objects.create(name='Test Label', creator=self.user)
         self.task = Task.objects.create(
             name='Test Task',
             description='Test Description',
@@ -182,3 +209,133 @@ class LabelViewsTest(TestCase):
             "Невозможно удалить метку, используемую в задачах",
             [msg.message for msg in response.wsgi_request._messages]
         )
+
+    def test_task_create_with_labels(self):
+        self.client.login(username='testuser', password='testpass')
+        label = Label.objects.create(name='Bug', creator=self.user)
+        response = self.client.post(reverse('task_create'), {
+            'name': 'New Task',
+            'description': 'Test Description',
+            'status': Status.objects.first().pk,
+            'labels': [label.id]
+        })
+        self.assertEqual(response.status_code, 302)
+        task = Task.objects.get(name='New Task')
+        self.assertEqual(task.labels.count(), 1)
+
+    def test_label_delete_allowed(self):
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.post(reverse('label_delete', args=[self.label.pk]))
+        self.assertFalse(Label.objects.filter(pk=self.label.pk).exists())
+
+    def test_label_update(self):
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.post(
+            reverse('label_update', args=[self.label.pk]),
+            {'name': 'Updated Label'}
+        )
+        self.assertEqual(response.status_code, 302)
+        self.label.refresh_from_db()
+        self.assertEqual(self.label.name, 'Updated Label')
+
+    def test_label_create_invalid(self):
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.post(reverse('label_create'), {'name': ''})
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context['form'].errors)
+        self.assertIn('name', response.context['form'].errors)
+        self.assertEqual(
+            response.context['form'].errors['name'][0],
+            'Обязательное поле.'
+        )
+
+    def test_label_delete_no_permission(self):
+        another_user = User.objects.create_user(username='another', password='testpass')
+        self.client.login(username='another', password='testpass')
+        response = self.client.post(reverse('label_delete', args=[self.label.pk]))
+        self.assertEqual(response.status_code, 403)
+        self.assertTrue(Label.objects.filter(pk=self.label.pk).exists())
+
+class TaskFilterTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(
+            username='testuser', 
+            password='testpass'
+        )
+        self.other_user = User.objects.create_user(
+            username='otheruser', 
+            password='testpass'
+        )
+        
+        self.status1 = Status.objects.create(name='Status1')
+        self.status2 = Status.objects.create(name='Status2')
+        
+        self.label1 = Label.objects.create(name='Label1', creator=self.user)
+        self.label2 = Label.objects.create(name='Label2', creator=self.user)
+        
+        self.task1 = Task.objects.create(
+            name='Task with Status1',
+            status=self.status1,
+            creator=self.user,
+            executor=self.user
+        )
+        self.task1.labels.add(self.label1)
+        
+        self.task2 = Task.objects.create(
+            name='Task with Status2',
+            status=self.status2,
+            creator=self.user,
+            executor=self.other_user
+        )
+        self.task2.labels.add(self.label2)
+        
+        self.task3 = Task.objects.create(
+            name='Other user task',
+            status=self.status1,
+            creator=self.other_user,
+            executor=self.user
+        )
+        
+        self.client.login(username='testuser', password='testpass')
+
+    def test_filter_by_status(self):
+        response = self.client.get(
+            reverse('tasks_list') + f'?status={self.status1.id}'
+        )
+        self.assertContains(response, self.task1.name)
+        self.assertContains(response, self.task3.name)
+        self.assertNotContains(response, self.task2.name)
+
+    def test_filter_by_executor(self):
+        response = self.client.get(
+            reverse('tasks_list') + f'?executor={self.other_user.id}'
+        )
+        self.assertContains(response, self.task2.name)
+        self.assertNotContains(response, self.task1.name)
+        self.assertNotContains(response, self.task3.name)
+
+    def test_filter_by_labels(self):
+        response = self.client.get(
+            reverse('tasks_list') + f'?labels={self.label1.id}'
+        )
+        self.assertContains(response, self.task1.name)
+        self.assertNotContains(response, self.task2.name)
+        self.assertNotContains(response, self.task3.name)
+
+    def test_filter_self_tasks(self):
+        response = self.client.get(
+            reverse('tasks_list') + '?self_tasks=on'
+        )
+        self.assertContains(response, self.task1.name)
+        self.assertContains(response, self.task2.name)
+        self.assertNotContains(response, self.task3.name)
+
+    def test_combined_filters(self):
+        response = self.client.get(
+            reverse('tasks_list') + 
+            f'?status={self.status1.id}&self_tasks=on'
+        )
+        self.assertContains(response, self.task1.name)
+        self.assertNotContains(response, self.task2.name)
+        self.assertNotContains(response, self.task3.name)

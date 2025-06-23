@@ -13,9 +13,7 @@ class StatusForm(forms.ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
         }
-        labels = {
-            'name': _('Name')
-        }
+        labels = {'name': _('Название')} 
 
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
@@ -46,14 +44,12 @@ class LabelForm(forms.ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
         }
-        labels = {
-            'name': _('Name')
-        }
+        labels = {'name': _('Название')} 
 
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ['name', 'description', 'status', 'executor']
+        fields = ['name', 'description', 'status', 'executor', 'labels']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
@@ -62,9 +58,9 @@ class TaskForm(forms.ModelForm):
             'labels': forms.SelectMultiple(attrs={'class': 'form-control'}),
         }
         labels = {
-            'name': 'Название',
-            'description': 'Описание',
-            'status': 'Статус',
-            'executor': 'Исполнитель',
-            'labels': 'Метки',
+            'name': _('Название'),
+            'description': _('Описание'),
+            'status': _('Статус'),
+            'executor': _('Исполнитель'),
+            'labels': _('Метки'),
         }

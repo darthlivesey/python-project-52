@@ -10,7 +10,14 @@ render-start:
 	.venv/bin/gunicorn src.wsgi
 
 migrate:
-	python manage.py migrate
+	python src/manage.py makemigrations
+	python src/manage.py migrate
+
+run:
+	python src/manage.py runserver
+
+test:
+	python src/manage.py test task_manager
 
 collectstatic:
-	python manage.py collectstatic --noinput
+	python src/manage.py collectstatic --noinput

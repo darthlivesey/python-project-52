@@ -13,6 +13,12 @@ class Status(models.Model):
 class Label(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name="Название")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    creator = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE,
+        related_name='created_labels',
+        verbose_name="Автор"
+    )
 
     def __str__(self):
         return self.name
@@ -34,3 +40,6 @@ class Task(models.Model):
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        ordering = ['-created_at'] 

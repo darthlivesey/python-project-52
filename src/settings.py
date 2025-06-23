@@ -2,10 +2,11 @@ import os
 from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
+from django.utils.translation import gettext as _
 
 load_dotenv()
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
@@ -20,6 +21,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_filters',
     'whitenoise.runserver_nostatic',
     'django_bootstrap5',
     'task_manager',
@@ -48,7 +50,7 @@ LOCALE_PATHS = [
 
 USE_I18N = True
 
-ROOT_URLCONF = 'src.urls'
+ROOT_URLCONF = 'urls'
 
 TEMPLATES = [
     {
@@ -61,12 +63,12 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.i18n',
             ],
         },
     },
 ]
-
-WSGI_APPLICATION = 'src.wsgi.application'
+WSGI_APPLICATION = 'wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
@@ -90,7 +92,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-LANGUAGE_CODE = 'ru-ru'
+LANGUAGE_CODE = 'ru'
 TIME_ZONE = 'Europe/Moscow'
 USE_I18N = True
 USE_TZ = True

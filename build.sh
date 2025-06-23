@@ -2,17 +2,13 @@
 set -e
 
 echo "### Installing dependencies with UV ###"
+# Создаем виртуальное окружение и устанавливаем зависимости
+uv venv
+source .venv/bin/activate
 uv pip install -r requirements.txt
 
-# Создаем временный manage.py в корне проекта
-MAIN_DIR="/opt/render/project/src"
-echo "import sys" > ${MAIN_DIR}/manage.py
-echo "from src.manage import main" >> ${MAIN_DIR}/manage.py
-echo "if __name__ == '__main__':" >> ${MAIN_DIR}/manage.py
-echo "    main()" >> ${MAIN_DIR}/manage.py
-
-# Переходим в корень проекта
-cd ${MAIN_DIR}
+# Переходим в директорию src
+cd src
 
 echo "### Compiling translations ###"
 python manage.py compilemessages

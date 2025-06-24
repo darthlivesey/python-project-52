@@ -2,19 +2,23 @@
 set -e
 
 echo "### Installing dependencies with UV ###"
-uv venv
-uv pip install -r requirements.txt
+# Используем системный Python Render.com
+PYTHON_BIN="/opt/render/project/python/Python-$PYTHON_VERSION/bin/python"
+UV_BIN="/opt/render/project/python/Python-$PYTHON_VERSION/bin/uv"
+
+# Устанавливаем зависимости в системное окружение Render.com
+$UV_BIN pip install -r requirements.txt
 
 echo "### Checking Django installation ###"
-.venv/bin/python -c "import django; print(django.__file__)"
+$PYTHON_BIN -c "import django; print(django.__file__)"
 
 echo "### Compiling translations ###"
-.venv/bin/python src/manage.py compilemessages
+$PYTHON_BIN src/manage.py compilemessages
 
 echo "### Applying migrations ###"
-.venv/bin/python src/manage.py migrate
+$PYTHON_BIN src/manage.py migrate
 
 echo "### Collecting static files ###"
-.venv/bin/python src/manage.py collectstatic --noinput --clear
+$PYTHON_BIN src/manage.py collectstatic --noinput --clear
 
 echo "### Build completed successfully ###"

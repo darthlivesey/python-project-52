@@ -2,21 +2,19 @@
 set -e
 
 echo "### Installing dependencies with UV ###"
-# Создаем виртуальное окружение
 uv venv
-# Устанавливаем зависимости
 uv pip install -r requirements.txt
 
-# Определяем абсолютный путь к Python в виртуальном окружении
-PYTHON_BIN="$(pwd)/.venv/bin/python"
+echo "### Checking Django installation ###"
+.venv/bin/python -c "import django; print(django.__file__)"
 
 echo "### Compiling translations ###"
-$PYTHON_BIN src/manage.py compilemessages
+.venv/bin/python src/manage.py compilemessages
 
 echo "### Applying migrations ###"
-$PYTHON_BIN src/manage.py migrate
+.venv/bin/python src/manage.py migrate
 
 echo "### Collecting static files ###"
-$PYTHON_BIN src/manage.py collectstatic --noinput --clear
+.venv/bin/python src/manage.py collectstatic --noinput --clear
 
 echo "### Build completed successfully ###"

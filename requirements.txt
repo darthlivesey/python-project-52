@@ -2,9 +2,13 @@
 #    uv pip compile pyproject.toml -o requirements.txt
 asgiref==3.8.1
     # via django
+certifi==2025.6.15
+    # via requests
+charset-normalizer==3.4.2
+    # via requests
 dj-database-url==3.0.0
     # via hexlet-code (pyproject.toml)
-django==5.2.3
+django==5.2.2
     # via
     #   hexlet-code (pyproject.toml)
     #   dj-database-url
@@ -16,9 +20,15 @@ django-filter==25.1
     # via hexlet-code (pyproject.toml)
 gunicorn==23.0.0
     # via hexlet-code (pyproject.toml)
+idna==3.10
+    # via requests
 packaging==25.0
     # via gunicorn
 python-dotenv==1.1.0
+    # via hexlet-code (pyproject.toml)
+requests==2.32.4
+    # via rollbar
+rollbar==1.3.0
     # via hexlet-code (pyproject.toml)
 sqlparse==0.5.3
     # via django
@@ -28,5 +38,7 @@ typing-extensions==4.14.0
     #   dj-database-url
 tzdata==2025.2
     # via django
+urllib3==2.5.0
+    # via requests
 whitenoise==6.9.0
     # via hexlet-code (pyproject.toml)

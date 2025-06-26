@@ -1,4 +1,5 @@
 import os
+import rollbar
 from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
@@ -12,7 +13,15 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,webserver').split(',')
+ALLOWED_HOSTS = [
+    'hexlet-code-d230.onrender.com',
+    'localhost',
+    '127.0.0.1',
+]
+
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -37,6 +46,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'rollbar.contrib.django.middleware.RollbarNotifierMiddlewareExcluding404',
 ]
 
 LANGUAGES = [
@@ -110,3 +120,31 @@ BOOTSTRAP5 = {
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 LOGIN_URL = 'login'
+
+ROLLBAR = {
+    'access_token': os.getenv('ROLLBAR_ACCESS_TOKEN'),
+    'environment': os.getenv('ROLLBAR_ENVIRONMENT', 'development'),
+    'code_version': '1.0',
+    'root': BASE_DIR,
+}
+
+rollbar.init(**ROLLBAR)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'rollbar': {
+            'class': 'rollbar.logger.RollbarHandler',
+            'access_token': ROLLBAR['access_token'],
+            'environment': ROLLBAR['environment'],
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['rollbar'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    },
+}

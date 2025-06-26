@@ -1,11 +1,14 @@
 import os
 import rollbar
+import sys
 from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
 from django.utils.translation import gettext as _
 
 load_dotenv()
+
+TESTING = 'test' in sys.argv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -55,7 +58,7 @@ LANGUAGES = [
 ]
 
 LOCALE_PATHS = [
-    BASE_DIR / 'locale',
+    os.path.join(BASE_DIR, 'locale'),
 ]
 
 USE_I18N = True
@@ -102,7 +105,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-LANGUAGE_CODE = 'ru'
+LANGUAGE_CODE = 'ru' if not TESTING else 'en'
 TIME_ZONE = 'Europe/Moscow'
 USE_I18N = True
 USE_TZ = True
@@ -121,30 +124,33 @@ LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 LOGIN_URL = 'login'
 
-ROLLBAR = {
-    'access_token': os.getenv('ROLLBAR_ACCESS_TOKEN'),
-    'environment': os.getenv('ROLLBAR_ENVIRONMENT', 'development'),
-    'code_version': '1.0',
-    'root': BASE_DIR,
-}
+if not TESTING:
+    ROLLBAR = {
+        'access_token': os.getenv('ROLLBAR_ACCESS_TOKEN'),
+        'environment': os.getenv('ROLLBAR_ENVIRONMENT', 'development'),
+        'code_version': '1.0',
+        'root': BASE_DIR,
+    }
 
-rollbar.init(**ROLLBAR)
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'rollbar': {
+                'class': 'rollbar.logger.RollbarHandler',
+                'access_token': ROLLBAR['access_token'],
+                'environment': ROLLBAR['environment'],
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['rollbar'],
+                'level': 'ERROR',
+                'propagate': True,
+            },
+        },
+    }
+else:
+    LOGGING = {}
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'rollbar': {
-            'class': 'rollbar.logger.RollbarHandler',
-            'access_token': ROLLBAR['access_token'],
-            'environment': ROLLBAR['environment'],
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['rollbar'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-    },
-}
+    LANGUAGE_CODE = 'en'

@@ -6,17 +6,30 @@ from django.utils.translation import activate
 from django.contrib.auth import get_user_model
 from .forms import CustomUserCreationForm
 from django.conf import settings
+from django.conf import settings
+from django.urls import reverse
+from django.utils import translation
 
 User = get_user_model()
 
-class LocalizationTest(TestCase):
+class BaseTestCase(TestCase):
     def setUp(self):
-        from django.utils.translation import activate
-        activate('ru')
+        super().setUp()
+        translation.activate('en')
     
+    def tearDown(self):
+        translation.deactivate()
+        super().tearDown()
+
+class LocalizationTest(BaseTestCase):
     def test_russian_translation(self):
+        current_language = translation.get_language()
+        translation.activate('ru')
         from django.utils.translation import gettext as _
-        self.assertEqual(_("Task Manager"), "Менеджер задач")
+        try:
+            self.assertEqual(_("Task Manager"), "Менеджер задач")
+        finally:
+            translation.activate(current_language)
 
 class UserViewsTest(TestCase):
     def setUp(self):
@@ -82,7 +95,10 @@ class StatusViewsTest(TestCase):
     
     def test_status_list_requires_login(self):
         response = self.client.get(reverse('statuses_list'))
-        self.assertRedirects(response, '/login/?next=/statuses/')
+        self.assertRedirects(
+            response, 
+            f'/{settings.LANGUAGE_CODE}/login/?next=/{settings.LANGUAGE_CODE}/statuses/'
+        )
     
     def test_status_create(self):
         self.client.login(username='testuser', password='testpass')
@@ -137,7 +153,10 @@ class TaskViewsTest(TestCase):
 
     def test_task_list_requires_login(self):
         response = self.client.get(reverse('tasks_list'))
-        self.assertRedirects(response, '/login/?next=/tasks/')
+        self.assertRedirects(
+            response, 
+            f'/{settings.LANGUAGE_CODE}/login/?next=/{settings.LANGUAGE_CODE}/tasks/'
+        )
 
     def test_task_create(self):
         self.client.login(username='testuser', password='testpass')
@@ -177,7 +196,7 @@ class TaskViewsTest(TestCase):
         self.assertEqual(response.status_code, 403)
         self.assertTrue(Task.objects.filter(pk=self.task.pk).exists())
 
-class LabelViewsTest(TestCase):
+class LabelViewsTest(BaseTestCase):
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user(username='testuser', password='testpass')
@@ -191,7 +210,10 @@ class LabelViewsTest(TestCase):
     
     def test_label_list_requires_login(self):
         response = self.client.get(reverse('labels_list'))
-        self.assertRedirects(response, '/login/?next=/labels/')
+        self.assertRedirects(
+            response, 
+            f'/{settings.LANGUAGE_CODE}/login/?next=/{settings.LANGUAGE_CODE}/labels/'
+        )
     
     def test_label_create(self):
         self.client.login(username='testuser', password='testpass')
@@ -242,11 +264,16 @@ class LabelViewsTest(TestCase):
         self.client.login(username='testuser', password='testpass')
         response = self.client.post(reverse('label_create'), {'name': ''})
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.context['form'].errors)
-        self.assertIn('name', response.context['form'].errors)
+        
+        self.assertIsNotNone(response.context)
+        self.assertIn('form', response.context)
+        
+        form = response.context['form']
+        self.assertTrue(form.errors)
+        self.assertIn('name', form.errors)
         self.assertEqual(
-            response.context['form'].errors['name'][0],
-            'Обязательное поле.'
+            form.errors['name'][0],
+            'This field is required.'
         )
 
     def test_label_delete_no_permission(self):

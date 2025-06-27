@@ -156,8 +156,18 @@ else:
     LANGUAGE_CODE = 'en'
 
 if not DEBUG:
-    SESSION_ENGINE = "django.contrib.sessions.backends.db"
+    SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
     CSRF_COOKIE_SECURE = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'unique-snowflake',
+        }
+    }
+    
+    MIDDLEWARE.insert(1, 'django.middleware.locale.LocaleMiddleware')

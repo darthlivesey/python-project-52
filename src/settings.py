@@ -154,3 +154,10 @@ else:
     LOGGING = {}
 
     LANGUAGE_CODE = 'en'
+
+if not DEBUG:
+    SESSION_ENGINE = "django.contrib.sessions.backends.db"
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

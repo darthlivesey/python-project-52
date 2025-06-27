@@ -38,15 +38,19 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li>
-                                <form action="{% url 'set_language' %}" method="post">
+                                <!-- Измененная форма с селектом вместо кнопок -->
+                                <form action="{% url 'set_language' %}" method="post" id="language-form">
                                     {% csrf_token %}
                                     <input name="next" type="hidden" value="{{ request.get_full_path }}">
-                                    <button type="submit" name="language" value="en" class="dropdown-item">
-                                        English
-                                    </button>
-                                    <button type="submit" name="language" value="ru" class="dropdown-item">
-                                        Русский
-                                    </button>
+                                    <select name="language" class="form-select form-select-sm">
+                                        {% get_current_language as LANGUAGE_CODE %}
+                                        {% get_available_languages as LANGUAGES %}
+                                        {% for code, name in LANGUAGES %}
+                                            <option value="{{ code }}" {% if code == LANGUAGE_CODE %}selected{% endif %}>
+                                                {{ name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
                                 </form>
                             </li>
                         </ul>
@@ -84,10 +88,20 @@
     </footer>
     
     <script>
-        document.querySelectorAll('.dropdown-item[type="submit"]').forEach(button => {
-            button.addEventListener('click', function() {
-                localStorage.setItem('django_language', this.value);
-            });
+        document.querySelector('select[name="language"]').addEventListener('change', function() {
+            this.form.submit();
+            
+            localStorage.setItem('django_language', this.value);
+        });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedLang = localStorage.getItem('django_language');
+            if (savedLang) {
+                const selector = document.querySelector('select[name="language"]');
+                if (selector && selector.value !== savedLang) {
+                    selector.value = savedLang;
+                }
+            }
         });
     </script>
 </body>

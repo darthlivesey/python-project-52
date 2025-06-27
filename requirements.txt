@@ -24,6 +24,8 @@ idna==3.10
     # via requests
 packaging==25.0
     # via gunicorn
+psycopg2-binary==2.9.10
+    # via hexlet-code (pyproject.toml)
 python-dotenv==1.1.0
     # via hexlet-code (pyproject.toml)
 requests==2.32.4

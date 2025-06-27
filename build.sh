@@ -12,14 +12,18 @@ echo "### Debug: Python path ###"
 python --version
 pip list
 
+echo "### Applying migrations ###"
+python src/manage.py migrate
+
+echo "### Compiling translations ###"
 cd src
 python manage.py compilemessages
 cd ..
 
-echo "### Applying migrations ###"
-python src/manage.py migrate
-
 echo "### Collecting static files ###"
 python src/manage.py collectstatic --noinput --clear
+
+echo "### Verifying translations ###"
+ls -l src/locale/ru/LC_MESSAGES
 
 echo "### Build completed successfully ###"

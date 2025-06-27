@@ -88,44 +88,9 @@
     </footer>
     
     <script>
-        document.querySelector('select[name="language"]')?.addEventListener('change', function() {
-            localStorage.setItem('django_language', this.value);
-            
-            this.form.submit();
-        });
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            const savedLang = localStorage.getItem('django_language');
-            const selector = document.querySelector('select[name="language"]');
-            
-            if (savedLang && selector && selector.value !== savedLang) {
-                selector.value = savedLang;
-                
-                fetch('/i18n/setlang/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'X-CSRFToken': getCookie('csrftoken'),
-                    },
-                    body: `language=${savedLang}&next=${encodeURIComponent(window.location.pathname)}`
-                }).then(() => window.location.reload());
-            }
-        });
-        
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
+    document.querySelector('select[name="language"]').addEventListener('change', function() {
+        this.form.submit();
+    });
     </script>
 </body>
 </html>

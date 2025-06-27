@@ -12,8 +12,9 @@ echo "### Debug: Python path ###"
 python --version
 pip list
 
-echo "### Compiling translations ###"
-python src/manage.py compilemessages
+cd src
+python manage.py compilemessages
+cd ..
 
 echo "### Applying migrations ###"
 python src/manage.py migrate

@@ -1,10 +1,10 @@
 import os
 import sys
+from pathlib import Path
 
-project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(project_root)
+project_root = Path(__file__).resolve().parent.parent
+sys.path.append(str(project_root))
 
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'src.settings')
 from django.core.wsgi import get_wsgi_application
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings')
 application = get_wsgi_application()

@@ -14,14 +14,21 @@ python --version
 pip list
 
 echo "### Applying migrations ###"
+cd src
 export DJANGO_SETTINGS_MODULE=src.settings
 
-python src/manage.py makemigrations --noinput || echo "No new migrations needed"
-
-python src/manage.py migrate
+python manage.py makemigrations --noinput || echo "No new migrations needed"
+python manage.py migrate
 
 echo "### Compiling translations ###"
-python src/manage.py compilemessages
+mkdir -p ../../locale/ru/LC_MESSAGES
+touch ../../locale/ru/LC_MESSAGES/django.po
+
+python manage.py compilemessages
+
+echo "### Verifying translations ###"
+ls -l ../../locale/ru/LC_MESSAGES
+cd ..
 
 echo "### Collecting static files ###"
 python src/manage.py collectstatic --noinput --clear

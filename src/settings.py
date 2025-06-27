@@ -6,13 +6,13 @@ import dj_database_url
 from dotenv import load_dotenv
 from django.utils.translation import gettext as _
 
-load_dotenv()
+load_dotenv(Path(__file__).resolve().parent.parent / '.env')
 
 TESTING = 'test' in sys.argv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-default-key-for-dev')
 
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
@@ -57,7 +57,14 @@ LANGUAGES = [
     ('ru', 'Russian'),
 ]
 
-LOCALE_PATHS = [BASE_DIR.parent / 'locale']
+LOCALE_PATHS = [
+    BASE_DIR / 'locale',
+    BASE_DIR / 'src/locale',
+]
+
+for path in LOCALE_PATHS:
+    ru_mo_path = path / 'ru/LC_MESSAGES/django.mo'
+    print(f"Checking translation: {ru_mo_path} - exists: {ru_mo_path.exists()}")
 
 USE_I18N = True
 
@@ -75,19 +82,29 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.i18n',
+                'task_manager.context_processors.language_context', 
             ],
         },
     },
 ]
+
 WSGI_APPLICATION = 'wsgi.application'
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL', 'sqlite:///db.sqlite3'),
-        conn_max_age=600,
-        engine='django.db.backends.postgresql'
-    )
-}
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+else:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.getenv('DATABASE_URL', 'sqlite:///db.sqlite3'),
+            conn_max_age=600,
+            engine='django.db.backends.postgresql'
+        )
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -151,10 +168,9 @@ if not TESTING:
     }
 else:
     LOGGING = {}
-
     LANGUAGE_CODE = 'en'
 
-if not DEBUG:
+if not TESTING and not DEBUG and 'ROLLBAR_ACCESS_TOKEN' in os.environ:
     SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True

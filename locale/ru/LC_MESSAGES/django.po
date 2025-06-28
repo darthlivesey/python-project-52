@@ -279,3 +279,17 @@ msgstr "Создать задачу"
 
 msgid "Cancel"
 msgstr "Отмена"
+
+#: task_manager/templates/users/users_list.html:10
+msgid "Full name"
+msgstr "Полное имя"
+
+#: task_manager/templates/base.html:55
+msgid "Create account"
+msgstr "Создать аккаунт"
+
+msgid "Created at"
+msgstr "Дата создания"
+
+msgid "Edit"
+msgstr "Изменить"

@@ -4,6 +4,7 @@ from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
+from django.conf import settings
 from django.shortcuts import redirect
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from django.contrib.auth import get_user_model

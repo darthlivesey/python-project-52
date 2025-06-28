@@ -6,7 +6,6 @@ from django.utils.translation import activate
 from django.contrib.auth import get_user_model
 from .forms import CustomUserCreationForm
 from django.conf import settings
-from django.conf import settings
 from django.urls import reverse
 from django.utils import translation
 

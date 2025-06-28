@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load django_bootstrap5 %}
 
 {% block content %}
 <div class="card shadow">
@@ -12,7 +13,7 @@
                 <tr>
                     <th>{% trans "ID" %}</th>
                     <th>{% trans "Username" %}</th>
-                    <th>{% trans "Full Name" %}</th>
+                    <th>{% trans "Full name" %}</th>  {# Изменено "Full Name" на "Full name" #}
                     <th>{% trans "Email" %}</th>
                     <th>{% trans "Actions" %}</th>
                 </tr>
@@ -34,7 +35,7 @@
                 {% endfor %}
             </tbody>
         </table>
-        <a href="{% url 'user_create' %}" class="btn btn-primary mt-3">{% trans "Create User" %}</a>
+        <a href="{% url 'user_create' %}" class="btn btn-primary mt-3">{% trans "Create user" %}</a>  {# Изменено "Create User" на "Create user" #}
     </div>
 </div>
 {% endblock %}

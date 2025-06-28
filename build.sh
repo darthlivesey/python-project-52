@@ -17,12 +17,16 @@ python manage.py makemigrations --noinput || echo "No new migrations needed"
 python manage.py migrate
 
 echo "### Compiling translations ###"
-cd ..
-django-admin compilemessages --settings=src.settings
+python manage.py compilemessages
 
 echo "### Verifying translations ###"
-ls -l locale/ru/LC_MESSAGES
-cd src
+if [ -f "../locale/ru/LC_MESSAGES/django.mo" ]; then
+    echo "Russian translation found"
+else
+    echo "WARNING: Russian translation not found!"
+    echo "Contents of locale directory:"
+    ls -R ../locale
+fi
 
 echo "### Collecting static files ###"
 python manage.py collectstatic --noinput --clear

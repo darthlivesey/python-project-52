@@ -251,3 +251,31 @@ msgstr "Пользователь успешно зарегистрирован!"
 #: task_manager/templates/base.html:37
 msgid "Language"
 msgstr "Язык"
+
+msgid "Create"
+msgstr "Создать"
+
+msgid "Create status"
+msgstr "Создать статус"
+
+msgid "Create label"
+msgstr "Создать метку"
+
+#: task_manager/templates/users/user_form.html:7
+msgid "Update User"
+msgstr "Редактировать пользователя"
+
+#: task_manager/templates/users/user_form.html:9
+msgid "Create User"
+msgstr "Создать пользователя"
+
+#: task_manager/templates/tasks/task_form.html:7
+msgid "Update Task"
+msgstr "Редактировать задачу"
+
+#: task_manager/templates/tasks/task_form.html:9
+msgid "Create Task"
+msgstr "Создать задачу"
+
+msgid "Cancel"
+msgstr "Отмена"

@@ -9,10 +9,6 @@ echo "### Installing dependencies with pip ###"
 pip install -r requirements.txt
 pip install --upgrade pip
 
-echo "### Debug: Python path ###"
-python --version
-pip list
-
 echo "### Applying migrations ###"
 cd src
 export DJANGO_SETTINGS_MODULE=src.settings
@@ -22,14 +18,13 @@ python manage.py migrate
 
 echo "### Compiling translations ###"
 cd ..
-django-admin compilemessages
-cd src
+django-admin compilemessages --settings=src.settings
 
 echo "### Verifying translations ###"
-ls -l ../locale/ru/LC_MESSAGES/django.*
-cd ..
+ls -l locale/ru/LC_MESSAGES
+cd src
 
 echo "### Collecting static files ###"
-python src/manage.py collectstatic --noinput --clear
+python manage.py collectstatic --noinput --clear
 
 echo "### Build completed successfully ###"

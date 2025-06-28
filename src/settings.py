@@ -194,3 +194,18 @@ if not TESTING and not DEBUG and 'ROLLBAR_ACCESS_TOKEN' in os.environ:
 
 WHITENOISE_MAX_AGE = 0
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+print("\n" + "="*50)
+print(f"BASE_DIR: {BASE_DIR}")
+print(f"LOCALE_PATHS: {LOCALE_PATHS}")
+
+for path in LOCALE_PATHS:
+    full_path = path
+    print(f"\nChecking: {full_path}")
+    print(f"Exists: {full_path.exists()}")
+    
+    if full_path.exists():
+        ru_path = full_path / 'ru/LC_MESSAGES/django.mo'
+        print(f"Russian translation exists: {ru_path.exists()}")
+    
+print("="*50 + "\n")

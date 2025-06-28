@@ -293,3 +293,11 @@ msgstr "Дата создания"
 
 msgid "Edit"
 msgstr "Изменить"
+
+#: task_manager/templates/tasks/task_list.html:15
+msgid "Only my tasks"
+msgstr "Только мои задачи"
+
+#: task_manager/templates/labels/label_list.html:25
+msgid "No labels found"
+msgstr "Метки не найдены"

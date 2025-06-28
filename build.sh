@@ -21,13 +21,12 @@ python manage.py makemigrations --noinput || echo "No new migrations needed"
 python manage.py migrate
 
 echo "### Compiling translations ###"
-mkdir -p ../../locale/ru/LC_MESSAGES
-touch ../../locale/ru/LC_MESSAGES/django.po
-
-python manage.py compilemessages
+cd ..
+django-admin compilemessages
+cd src
 
 echo "### Verifying translations ###"
-ls -l ../../locale/ru/LC_MESSAGES
+ls -l ../locale/ru/LC_MESSAGES/django.*
 cd ..
 
 echo "### Collecting static files ###"

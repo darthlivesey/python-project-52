@@ -17,6 +17,17 @@ from .filters import TaskFilter
 
 User = get_user_model()
 
+def debug_lang(request):
+    from django.utils import translation
+    info = {
+        "REQUEST_LANGUAGE": request.LANGUAGE_CODE,
+        "GET_LANGUAGE": translation.get_language(),
+        "SESSION_LANGUAGE": request.session.get('django_language', 'not set'),
+        "COOKIE_LANGUAGE": request.COOKIES.get('django_language', 'not set'),
+        "LOCALE_PATHS": settings.LOCALE_PATHS,
+    }
+    return render(request, 'debug.html', {'info': info})
+
 def index(request):
     return render(request, 'index.html')
 

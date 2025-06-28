@@ -59,7 +59,6 @@ LANGUAGES = [
 
 LOCALE_PATHS = [
     BASE_DIR / 'locale',
-    BASE_DIR / 'src/locale',
 ]
 
 for path in LOCALE_PATHS:
@@ -140,6 +139,12 @@ LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 LOGIN_URL = 'login'
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}
+
 if not TESTING:
     ROLLBAR = {
         'access_token': os.getenv('ROLLBAR_ACCESS_TOKEN'),
@@ -186,3 +191,6 @@ if not TESTING and not DEBUG and 'ROLLBAR_ACCESS_TOKEN' in os.environ:
     }
     
     MIDDLEWARE.insert(1, 'django.middleware.locale.LocaleMiddleware')
+
+WHITENOISE_MAX_AGE = 0
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

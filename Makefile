@@ -19,7 +19,7 @@ test:
 	python src/manage.py test task_manager --verbosity=2
 
 lint:
-	flake8 src
+	flake8 src task_manager
 
 coverage:
 	coverage run --source='.' src/manage.py test task_manager

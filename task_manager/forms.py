@@ -4,7 +4,9 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 from .models import Status, Task, Label
 
+
 User = get_user_model()
+
 
 class StatusForm(forms.ModelForm):
     class Meta:
@@ -13,7 +15,8 @@ class StatusForm(forms.ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
         }
-        labels = {'name': _('Название')} 
+        labels = {'name': _('Название')}
+
 
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
@@ -26,6 +29,7 @@ class CustomUserCreationForm(UserCreationForm):
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
         }
 
+
 class CustomUserChangeForm(UserChangeForm):
     class Meta:
         model = User
@@ -37,6 +41,7 @@ class CustomUserChangeForm(UserChangeForm):
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
         }
 
+
 class LabelForm(forms.ModelForm):
     class Meta:
         model = Label
@@ -44,7 +49,8 @@ class LabelForm(forms.ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
         }
-        labels = {'name': _('Название')} 
+        labels = {'name': _('Название')}
+
 
 class TaskForm(forms.ModelForm):
     class Meta:

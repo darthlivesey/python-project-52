@@ -33,4 +33,8 @@ prepare-hexlet:
 	cp requirements.txt code/
 
 start-server:
-	cd code && /project/.venv/bin/python manage.py runserver 0.0.0.0:3000
+	cd code && \
+	python3.10 -m venv .venv && \
+	source .venv/bin/activate && \
+	pip install -r requirements.txt && \
+	python manage.py runserver 0.0.0.0:3000

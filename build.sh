@@ -1,12 +1,6 @@
 #!/bin/bash
 set -o errexit
 
-echo "### Creating virtual environment ###"
-python3.10 -m venv .venv
-source .venv/bin/activate
-
-chmod +x manage.py
-
 echo "### Installing dependencies with pip ###"
 pip install -r requirements.txt
 pip install --upgrade pip

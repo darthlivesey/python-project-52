@@ -67,7 +67,7 @@ for path in LOCALE_PATHS:
 
 USE_I18N = True
 
-ROOT_URLCONF = 'urls'
+ROOT_URLCONF = 'src.urls'
 
 TEMPLATES = [
     {
@@ -175,22 +175,43 @@ else:
     LOGGING = {}
     LANGUAGE_CODE = 'en'
 
-if not TESTING and not DEBUG and 'ROLLBAR_ACCESS_TOKEN' in os.environ:
+if not TESTING and not DEBUG and os.getenv('ROLLBAR_ACCESS_TOKEN'):
+    import rollbar
+    rollbar.init(
+        os.getenv('ROLLBAR_ACCESS_TOKEN'),
+        environment=os.getenv('ROLLBAR_ENVIRONMENT', 'production'),
+        root=BASE_DIR,
+    )
+    
+    MIDDLEWARE.append('rollbar.contrib.django.middleware.RollbarNotifierMiddlewareExcluding404')
+    
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'rollbar': {
+                'class': 'rollbar.logger.RollbarHandler',
+                'access_token': os.getenv('ROLLBAR_ACCESS_TOKEN'),
+                'environment': os.getenv('ROLLBAR_ENVIRONMENT', 'production'),
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['rollbar'],
+                'level': 'ERROR',
+                'propagate': True,
+            },
+        },
+    }
+
     SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
     CSRF_COOKIE_SECURE = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-            'LOCATION': 'unique-snowflake',
-        }
-    }
-    
-    MIDDLEWARE.insert(1, 'django.middleware.locale.LocaleMiddleware')
+else:
+    LOGGING = {}
 
 WHITENOISE_MAX_AGE = 0
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

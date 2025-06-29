@@ -3,17 +3,16 @@ import os
 import sys
 
 
-def activate_virtual_environment():
-    """Activate the virtual environment explicitly"""
-    venv_path = '/project/.venv'
-    if os.path.exists(venv_path):
-        activate_script = os.path.join(venv_path, 'bin', 'activate_this.py')
-        if os.path.exists(activate_script):
-            with open(activate_script) as f:
-                exec(f.read(), {'__file__': activate_script})
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
 
-
-activate_virtual_environment()
+venv_path = '/project/.venv'
+if os.path.exists(venv_path):
+    activate_script = os.path.join(venv_path, 'bin', 'activate_this.py')
+    if os.path.exists(activate_script):
+        with open(activate_script) as f:
+            exec(f.read(), {'__file__': activate_script})
 
 
 def main():

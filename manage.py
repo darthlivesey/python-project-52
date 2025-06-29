@@ -4,6 +4,7 @@ import sys
 import subprocess
 from pathlib import Path
 
+
 main_manage = Path(__file__).resolve().parent / 'src' / 'manage.py'
 
 if not main_manage.exists():
@@ -15,4 +16,3 @@ try:
     subprocess.run(cmd, check=True)
 except subprocess.CalledProcessError as e:
     sys.exit(e.returncode)
-    

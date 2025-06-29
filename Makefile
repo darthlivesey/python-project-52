@@ -33,5 +33,14 @@ prepare-hexlet:
 	cp requirements.txt code/
 
 start-server:
-	cd code && pip install -r requirements.txt
-	cd code && python manage.py runserver 0.0.0.0:3000
+	cd code && \
+	if [ -d .venv ]; then \
+		. .venv/bin/activate && \
+		python manage.py runserver 0.0.0.0:3000; \
+	else \
+		echo "Creating virtual environment..." && \
+		python3.10 -m venv .venv && \
+		. .venv/bin/activate && \
+		pip install -r requirements.txt && \
+		python manage.py runserver 0.0.0.0:3000; \
+	fi

@@ -16,7 +16,7 @@ run:
 	python src/manage.py runserver
 
 test:
-	python src/manage.py test task_manager --verbosity=2
+	python src/manage.py test tests --verbosity=2
 
 lint:
 	flake8 src task_manager

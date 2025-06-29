@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
     'django_bootstrap5',
     'task_manager',
+    'tests',
 ]
 
 MIDDLEWARE = [

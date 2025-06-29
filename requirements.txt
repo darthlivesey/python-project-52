@@ -47,4 +47,3 @@ whitenoise==6.9.0
 
 coverage==7.0.0
 flake8==7.0.0
-sonar-scanner-cli==4.8.0

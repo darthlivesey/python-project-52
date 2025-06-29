@@ -3,17 +3,12 @@ import os
 import sys
 from pathlib import Path
 
+# Путь к основному manage.py
+main_manage = Path(__file__).resolve().parent / 'src' / 'manage.py'
 
-VENV_PATH = Path('/project/.venv/bin/activate_this.py')
-if VENV_PATH.exists():
-    with open(VENV_PATH, 'r') as f:
-        code = compile(f.read(), VENV_PATH, 'exec')
-        exec(code, {'__file__': str(VENV_PATH)})
-
-SRC_MANAGE = Path(__file__).parent / 'src' / 'manage.py'
-if not SRC_MANAGE.exists():
-    sys.exit(f"Error: Main manage.py not found at {SRC_MANAGE}")
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "src.settings")
-sys.argv.insert(0, str(SRC_MANAGE))
-exec(open(SRC_MANAGE).read(), {'__name__': '__main__', '__file__': SRC_MANAGE})
+# Запускаем основной manage.py
+if main_manage.exists():
+    os.execv(str(main_manage), [str(main_manage)] + sys.argv[1:])
+else:
+    sys.stderr.write(f"Error: Main manage.py not found at {main_manage}\n")
+    sys.exit(1)

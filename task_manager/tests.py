@@ -1,12 +1,10 @@
-from django.test import TestCase
-from .models import Status, Task, Label
-from django.test import Client, override_settings
+from django.test import TestCase, Client
 from django.urls import reverse
 from django.utils.translation import activate
 from django.contrib.auth import get_user_model
-from .forms import CustomUserCreationForm
 from django.conf import settings
 from django.utils import translation
+from task_manager.models import Status, Task, Label
 
 
 User = get_user_model()

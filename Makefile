@@ -1,4 +1,4 @@
-.PHONY: install build render-start migrate collectstatic test lint coverage
+.PHONY: install build render-start migrate collectstatic test lint coverage prepare-hexlet start-server
 
 install:
 	uv pip install -r requirements.txt
@@ -24,3 +24,14 @@ lint:
 coverage:
 	coverage run --source='.' src/manage.py test task_manager
 	coverage xml -i
+
+prepare-hexlet:
+	mkdir -p code
+	cp -r src code/
+	cp -r task_manager code/
+	cp manage.py code/
+	cp requirements.txt code/
+
+start-server:
+	cd code && pip install -r requirements.txt
+	cd code && python manage.py runserver 0.0.0.0:3000

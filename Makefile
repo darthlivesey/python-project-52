@@ -33,11 +33,4 @@ prepare-hexlet:
 	cp requirements.txt code/
 
 start-server:
-	@echo "### STARTING SERVER WITH PYTHON 3.10 ###"
-	cd code && \
-	python3.10 --version && \
-	python3.10 -m venv .venv && \
-	. .venv/bin/activate && \
-	pip list && \
-	python -c "import django; print('Django version:', django.__version__)" && \
-	python manage.py runserver 0.0.0.0:3000
+	cd code && ./manage.py runserver 0.0.0.0:3000

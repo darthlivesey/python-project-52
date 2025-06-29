@@ -33,7 +33,11 @@ prepare-hexlet:
 	cp requirements.txt code/
 
 start-server:
-	@echo "Checking virtual environment at /project/.venv:"
-	ls -la /project/.venv/bin/python || echo "Python not found in venv!"
-	cd code && /project/.venv/bin/python -c "import django; print(django.__version__)" && \
-	/project/.venv/bin/python manage.py runserver 0.0.0.0:3000
+	@echo "### STARTING SERVER WITH PYTHON 3.10 ###"
+	cd code && \
+	python3.10 --version && \
+	python3.10 -m venv .venv && \
+	. .venv/bin/activate && \
+	pip list && \
+	python -c "import django; print('Django version:', django.__version__)" && \
+	python manage.py runserver 0.0.0.0:3000

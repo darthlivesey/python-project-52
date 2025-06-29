@@ -18,6 +18,7 @@ if os.path.exists(venv_path):
         with open(activate_script) as f:
             exec(f.read(), {'__file__': activate_script})
 
+
 def main():
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'src.settings')
     try:
@@ -29,6 +30,7 @@ def main():
             "forget to activate a virtual environment?"
         ) from exc
     execute_from_command_line(sys.argv)
+
 
 if __name__ == '__main__':
     main()

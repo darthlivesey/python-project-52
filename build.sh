@@ -11,6 +11,9 @@ echo "### Installing dependencies with pip ###"
 pip install -r requirements.txt
 pip install --upgrade pip
 
+echo "### Verifying Django installation ###"
+./.venv/bin/python -c "import django; print('Django version:', django.__version__)" || echo "Django not found!"
+
 echo "### Applying migrations ###"
 cd src
 export DJANGO_SETTINGS_MODULE=src.settings

@@ -1,4 +1,4 @@
-.PHONY: install build render-start migrate collectstatic test
+.PHONY: install build render-start migrate collectstatic test lint coverage
 
 install:
 	uv pip install -r requirements.txt
@@ -16,7 +16,11 @@ run:
 	python src/manage.py runserver
 
 test:
-	python src/manage.py test task_manager
+	python src/manage.py test task_manager --verbosity=2
 
-collectstatic:
-	python src/manage.py collectstatic --noinput
+lint:
+	flake8 src
+
+coverage:
+	coverage run --source='.' src/manage.py test task_manager
+	coverage xml -i

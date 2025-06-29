@@ -44,3 +44,7 @@ urllib3==2.5.0
     # via requests
 whitenoise==6.9.0
     # via hexlet-code (pyproject.toml)
+
+coverage==7.0.0
+flake8==7.0.0
+sonar-scanner-cli==4.8.0

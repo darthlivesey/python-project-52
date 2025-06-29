@@ -1,5 +1,9 @@
 Менеджер задач (Task Manager)
-https://github.com/darthlivesey/python-project-52/actions/workflows/hexlet-check.yml/badge.svg
+### Hexlet tests and linter status:
+[![Actions Status](https://github.com/darthlivesey/python-project-52/actions/workflows/ci.yml/badge.svg)](https://github.com/darthlivesey/python-project-52/actions)
+
+### SonarCloud Quality Gate:
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=your-project-key&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=your-project-key)
 
 Task Manager - это веб-приложение для управления задачами, разработанное на Django. Оно позволяет командам эффективно создавать, назначать и отслеживать задачи, управлять статусами выполнения и метками задач.
 

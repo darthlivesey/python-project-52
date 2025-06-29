@@ -33,10 +33,7 @@ prepare-hexlet:
 	cp requirements.txt code/
 
 start-server:
-	@echo "Current path: $(PWD)"
-	@echo "VENV path: ../.venv"
-	cd code && \
-	source ../.venv/bin/activate && \
-	which python && \
-	python --version && \
-	python manage.py runserver 0.0.0.0:3000
+	@echo "Checking virtual environment at /project/.venv:"
+	ls -la /project/.venv/bin/python || echo "Python not found in venv!"
+	cd code && /project/.venv/bin/python -c "import django; print(django.__version__)" && \
+	/project/.venv/bin/python manage.py runserver 0.0.0.0:3000

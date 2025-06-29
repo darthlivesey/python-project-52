@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:15  # Обновлено до версии 15
+        image: postgres:15
         env:
           POSTGRES_USER: testuser
           POSTGRES_PASSWORD: testpass
@@ -56,7 +56,7 @@ jobs:
         python src/manage.py migrate
 
     - name: Run linter
-      run: flake8 src
+      run: flake8 src task_manager
 
     - name: Run tests
       env:
@@ -80,7 +80,7 @@ jobs:
         sonar-scanner \
           -Dsonar.projectKey=your-project-key \
           -Dsonar.organization=your-organization \
-          -Dsonar.sources=src \
+          -Dsonar.sources=src,task_manager \
           -Dsonar.python.coverage.reportPaths=coverage.xml \
-          -Dsonar.host.url=https://sonarcloud.io
-          -Dsonar.tests=task_manager/tests.py
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.tests=task_manager

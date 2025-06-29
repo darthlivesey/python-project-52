@@ -1,6 +1,10 @@
 #!/bin/bash
 set -o errexit
 
+echo "### COPYING VENV TO CODE ###"
+cp -r .venv code/
+ls -la code/.venv
+
 echo "### Installing dependencies with pip ###"
 pip install -r requirements.txt
 pip install --upgrade pip

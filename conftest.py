@@ -3,8 +3,14 @@ import sys
 import django
 
 
+TASK_MANAGER_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'task_manager')
+if TASK_MANAGER_PATH not in sys.path:
+    sys.path.insert(0, TASK_MANAGER_PATH)
+
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, BASE_DIR)
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
 
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "src.settings")

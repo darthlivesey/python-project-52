@@ -6,6 +6,11 @@ import dj_database_url
 from dotenv import load_dotenv
 from django.utils.translation import gettext as _
 
+
+print("Python paths:", sys.path)
+print("Current directory:", os.getcwd())
+print("Files:", os.listdir('.'))
+
 load_dotenv(Path(__file__).resolve().parent.parent / '.env')
 
 TESTING = 'test' in sys.argv

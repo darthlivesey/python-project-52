@@ -1,24 +1,20 @@
 import os
-import rollbar
 import sys
-from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
 from django.utils.translation import gettext as _
 
 
-print("Python paths:", sys.path)
-print("Current directory:", os.getcwd())
-print("Files:", os.listdir('.'))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-load_dotenv(Path(__file__).resolve().parent.parent / '.env')
+print(f"Absolute path to settings.py: {os.path.abspath(__file__)}")
+print(f"Computed BASE_DIR: {BASE_DIR}")
+
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 TESTING = 'test' in sys.argv
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-default-key-for-dev')
-
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = [
@@ -42,7 +38,6 @@ INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
     'django_bootstrap5',
     'task_manager',
-    'tests',
 ]
 
 MIDDLEWARE = [
@@ -64,21 +59,26 @@ LANGUAGES = [
 ]
 
 LOCALE_PATHS = [
-    BASE_DIR / 'locale',
+    os.path.join(BASE_DIR, 'locale'),
 ]
 
-for path in LOCALE_PATHS:
-    ru_mo_path = path / 'ru/LC_MESSAGES/django.mo'
-    print(f"Checking translation: {ru_mo_path} - exists: {ru_mo_path.exists()}")
+if not TESTING:
+    from django.core.management import call_command
+    po_path = os.path.join(BASE_DIR, 'locale', 'ru', 'LC_MESSAGES', 'django.po')
+    if os.path.exists(po_path):
+        try:
+            call_command('compilemessages', verbosity=0)
+            print("Successfully compiled translations")
+        except Exception as e:
+            print(f"Error compiling translations: {e}")
 
 USE_I18N = True
-
 ROOT_URLCONF = 'src.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'task_manager' / 'templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'task_manager', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -87,19 +87,19 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.i18n',
-                'task_manager.context_processors.language_context', 
+                'task_manager.context_processors.language_context',
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'wsgi.application'
+WSGI_APPLICATION = 'src.wsgi.application'
 
-if DEBUG:
+if DEBUG or TESTING:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         }
     }
 else:
@@ -132,7 +132,7 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -145,59 +145,22 @@ LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 LOGIN_URL = 'login'
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-    }
-}
-
-if not TESTING:
+ROLLBAR_ACCESS_TOKEN = os.getenv('ROLLBAR_ACCESS_TOKEN')
+if ROLLBAR_ACCESS_TOKEN and not DEBUG and not TESTING:
     ROLLBAR = {
-        'access_token': os.getenv('ROLLBAR_ACCESS_TOKEN'),
-        'environment': os.getenv('ROLLBAR_ENVIRONMENT', 'development'),
-        'code_version': '1.0',
+        'access_token': ROLLBAR_ACCESS_TOKEN,
+        'environment': os.getenv('ROLLBAR_ENVIRONMENT', 'production'),
         'root': BASE_DIR,
     }
-
-    LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'handlers': {
-            'rollbar': {
-                'class': 'rollbar.logger.RollbarHandler',
-                'access_token': ROLLBAR['access_token'],
-                'environment': ROLLBAR['environment'],
-            },
-        },
-        'loggers': {
-            'django': {
-                'handlers': ['rollbar'],
-                'level': 'ERROR',
-                'propagate': True,
-            },
-        },
-    }
-else:
-    LOGGING = {}
-    LANGUAGE_CODE = 'en'
-
-if not TESTING and not DEBUG and os.getenv('ROLLBAR_ACCESS_TOKEN'):
-    import rollbar
-    rollbar.init(
-        os.getenv('ROLLBAR_ACCESS_TOKEN'),
-        environment=os.getenv('ROLLBAR_ENVIRONMENT', 'production'),
-        root=BASE_DIR,
-    )
-    
     MIDDLEWARE.append('rollbar.contrib.django.middleware.RollbarNotifierMiddlewareExcluding404')
-    
+
     LOGGING = {
         'version': 1,
         'disable_existing_loggers': False,
         'handlers': {
             'rollbar': {
                 'class': 'rollbar.logger.RollbarHandler',
-                'access_token': os.getenv('ROLLBAR_ACCESS_TOKEN'),
+                'access_token': ROLLBAR_ACCESS_TOKEN,
                 'environment': os.getenv('ROLLBAR_ENVIRONMENT', 'production'),
             },
         },
@@ -209,30 +172,26 @@ if not TESTING and not DEBUG and os.getenv('ROLLBAR_ACCESS_TOKEN'):
             },
         },
     }
-
-    SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
-    SESSION_COOKIE_SECURE = True
-    SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = 'Lax'
-    CSRF_COOKIE_SECURE = True
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 else:
     LOGGING = {}
 
-WHITENOISE_MAX_AGE = 0
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+if TESTING:
+    LANGUAGE_CODE = 'en'
+    PASSWORD_HASHERS = [
+        'django.contrib.auth.hashers.MD5PasswordHasher',
+    ]
 
 print("\n" + "="*50)
-print(f"BASE_DIR: {BASE_DIR}")
 print(f"LOCALE_PATHS: {LOCALE_PATHS}")
 
 for path in LOCALE_PATHS:
-    full_path = path
-    print(f"\nChecking: {full_path}")
-    print(f"Exists: {full_path.exists()}")
+    print(f"\nChecking: {path}")
+    print(f"Exists: {os.path.exists(path)}")
     
-    if full_path.exists():
-        ru_path = full_path / 'ru/LC_MESSAGES/django.mo'
-        print(f"Russian translation exists: {ru_path.exists()}")
+    if os.path.exists(path):
+        po_path = os.path.join(path, 'ru/LC_MESSAGES/django.po')
+        mo_path = os.path.join(path, 'ru/LC_MESSAGES/django.mo')
+        print(f"Russian PO file exists: {os.path.exists(po_path)}")
+        print(f"Russian MO file exists: {os.path.exists(mo_path)}")
     
 print("="*50 + "\n")

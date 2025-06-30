@@ -6,6 +6,8 @@ from django.utils.translation import gettext as _
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(BASE_DIR, '..'))
+sys.path.insert(0, BASE_DIR)
 
 print(f"Absolute path to settings.py: {os.path.abspath(__file__)}")
 print(f"Computed BASE_DIR: {BASE_DIR}")

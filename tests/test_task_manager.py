@@ -14,6 +14,9 @@ class BaseTestCase(TestCase):
     def setUp(self):
         super().setUp()
         translation.activate('en')
+        self.Status = Status
+        self.Task = Task
+        self.Label = Label
 
     def tearDown(self):
         translation.deactivate()

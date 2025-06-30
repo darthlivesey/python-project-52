@@ -180,6 +180,8 @@ if TESTING:
     PASSWORD_HASHERS = [
         'django.contrib.auth.hashers.MD5PasswordHasher',
     ]
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+    WHITENOISE_AUTOREFRESH = True
 
 print("\n" + "="*50)
 print(f"LOCALE_PATHS: {LOCALE_PATHS}")

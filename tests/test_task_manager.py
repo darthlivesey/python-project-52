@@ -22,7 +22,6 @@ class BaseTestCase(TestCase):
         translation.deactivate()
         super().tearDown()
 
-
 class LocalizationTest(BaseTestCase):
     def test_russian_translation(self):
         current_language = translation.get_language()
@@ -263,6 +262,8 @@ class LabelViewsTest(BaseTestCase):
         self.assertEqual(self.label.name, 'Updated Label')
 
     def test_label_create_invalid(self):
+        from django.utils.translation import activate
+        activate('en')
         self.client.login(username='testuser', password='testpass')
         response = self.client.post(reverse('label_create'), {'name': ''})
         self.assertEqual(response.status_code, 200)

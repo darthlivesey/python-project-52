@@ -64,8 +64,10 @@ jobs:
         DATABASE_URL: postgres://testuser:testpass@localhost:5432/testdb
         SECRET_KEY: testsecret
         DEBUG: "False"
+        DJANGO_SETTINGS_MODULE: config.base
       run: |
-        pytest tests --verbosity=2
+        export PYTHONPATH=$PWD
+        python manage.py test tests --verbosity=2
 
     - name: Generate coverage report
       env:

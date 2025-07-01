@@ -2,6 +2,16 @@
 import os
 import sys
 
+if not sys.prefix.endswith('.venv'):
+    venv_path = os.path.join(os.path.dirname(__file__), '..', '.venv')
+    if os.path.exists(venv_path):
+        activate_this = os.path.join(venv_path, 'bin', 'activate_this.py')
+        if os.path.exists(activate_this):
+            with open(activate_this) as f:
+                code = compile(f.read(), activate_this, 'exec')
+                exec(code, {'__file__': activate_this})
+
+
 def main():
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.base")
     try:

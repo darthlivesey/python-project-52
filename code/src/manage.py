@@ -1,4 +1,4 @@
-#!/project/.venv/bin/python
+#!/usr/bin/env python
 import os
 import sys
 
@@ -11,7 +11,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
-venv_path = '/project/.venv'
+
+venv_path = os.path.join(os.path.dirname(BASE_DIR), '.venv')
 if os.path.exists(venv_path):
     activate_script = os.path.join(venv_path, 'bin', 'activate_this.py')
     if os.path.exists(activate_script):

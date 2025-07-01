@@ -7,20 +7,20 @@ build:
 	./build.sh
 
 render-start:
-	gunicorn src.wsgi:application --pythonpath src
+	gunicorn config.wsgi:application
 
 migrate:
-	python src/manage.py migrate
+	python manage.py migrate
 
 run:
-	python src/manage.py runserver
+	python manage.py runserver
 
 test:
-	python src/manage.py test tests --verbosity=2
+	python manage.py test tests --verbosity=2
 
 lint:
-	flake8 src task_manager
+	flake8 config task_manager
 
 coverage:
-	coverage run --source='.' src/manage.py test task_manager
+	coverage run --source='.' manage.py test task_manager
 	coverage xml -i

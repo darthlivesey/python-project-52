@@ -6,7 +6,6 @@ from django.utils.translation import gettext as _
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(BASE_DIR, '..'))
 sys.path.insert(0, BASE_DIR)
 
 print(f"Absolute path to settings.py: {os.path.abspath(__file__)}")
@@ -65,12 +64,12 @@ LOCALE_PATHS = [
 ]
 
 USE_I18N = True
-ROOT_URLCONF = 'src.urls'
+ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'task_manager', 'templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -85,7 +84,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'src.wsgi.application'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 if DEBUG or TESTING:
     DATABASES = {

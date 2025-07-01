@@ -43,7 +43,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y openjdk-17-jre
-        wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
+        wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-5.0.1.3006-linux.zip
         unzip sonar-scanner-cli-5.0.1.3006-linux.zip
         sudo mv sonar-scanner-5.0.1.3006-linux /opt/sonar-scanner
         echo "/opt/sonar-scanner/bin" >> $GITHUB_PATH
@@ -52,48 +52,40 @@ jobs:
       env:
         DATABASE_URL: postgres://testuser:testpass@localhost:5432/testdb
         SECRET_KEY: testsecret
-        PYTHONPATH: ${{ github.workspace }}/src:${{ github.workspace }}
       run: |
-        python src/manage.py migrate
+        python manage.py migrate  # Убрали src/
 
     - name: Run linter
-      run: flake8 src task_manager
+      run: flake8 config task_manager
 
     - name: Run tests
       env:
         DATABASE_URL: postgres://testuser:testpass@localhost:5432/testdb
         SECRET_KEY: testsecret
         DEBUG: "False"
-        PYTHONPATH: ${{ github.workspace }}/src:${{ github.workspace }}
       run: |
         pytest tests --verbosity=2
 
     - name: Generate coverage report
       env:
         DATABASE_URL: postgres://testuser:testpass@localhost:5432/testdb
-        PYTHONPATH: ${{ github.workspace }}/src:${{ github.workspace }}
       run: |
-        coverage run --source='.' -m pytest tests
+        coverage run --source='.' manage.py test task_manager  # Обновлено
         coverage xml -i
 
     - name: Verify sonar-project.properties
       run: |
-        echo "Current sonar-project.properties content:"
-        cat sonar-project.properties
-        echo ""
         echo "Updating sonar-project.properties..."
         echo 'sonar.projectKey=darthlivesey_python-project-52' > sonar-project.properties
         echo 'sonar.organization=darthlivesey' >> sonar-project.properties
         echo 'sonar.projectName=Python Project 52' >> sonar-project.properties
-        echo 'sonar.sources=src,task_manager' >> sonar-project.properties
+        echo 'sonar.sources=config,task_manager' >> sonar-project.properties  # Обновлено
         echo 'sonar.tests=tests' >> sonar-project.properties
         echo 'sonar.sourceEncoding=UTF-8' >> sonar-project.properties
         echo 'sonar.python.coverage.reportPaths=coverage.xml' >> sonar-project.properties
         echo 'sonar.exclusions=**/.venv/**,**/staticfiles/**,**/__pycache__/**' >> sonar-project.properties
         echo 'sonar.language=py' >> sonar-project.properties
         echo 'sonar.python.version=3.10' >> sonar-project.properties
-        echo "Updated sonar-project.properties content:"
-        cat sonar-project.properties
 
     - name: Run SonarScanner
       env:

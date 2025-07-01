@@ -1,57 +1,39 @@
 #!/bin/bash
 set -o errexit
 
-echo "### Проверка и создание структуры проекта ###"
-echo "Содержимое корневой папки:"
-ls -la
+echo "### Reorganizing project structure ###"
+mkdir -p config
+mv src/settings.py config/base.py
+touch config/__init__.py
+mv src/urls.py config/
+mv src/wsgi.py config/
+[ -f src/asgi.py ] && mv src/asgi.py config/
 
-echo "### Создание необходимых симлинков в code/ ###"
-mkdir -p code
-ln -sfn ../src code/src || true
-ln -sfn ../task_manager code/task_manager || true
-ln -sfn ../src/manage.py code/manage.py || true
+echo "### Moving templates and static files ###"
+mkdir -p templates
+mv task_manager/templates/* templates/ || echo "No templates to move"
 
-echo "### Проверка созданных симлинков ###"
-echo "Содержимое code/:"
-ls -la code
-echo "Проверка src:"
-ls -l code/src
-echo "Проверка task_manager:"
-ls -l code/task_manager
-echo "Проверка manage.py:"
-ls -l code/manage.py
-
-echo "### Копирование venv ###"
-cp -r .venv code/ || echo "Копирование venv пропущено"
-ls -la code/.venv || echo "Venv не скопирован"
-
-echo "### Установка зависимостей ###"
+echo "### Installing dependencies ###"
 pip install -r requirements.txt
 pip install --upgrade pip
 
-echo "### Проверка установки Django ###"
-./.venv/bin/python -c "import django; print('Django version:', django.__version__)" || echo "Django not found!"
-
-echo "### Применение миграций ###"
-cd src
-export DJANGO_SETTINGS_MODULE=src.settings
-
+echo "### Applying migrations ###"
 python manage.py makemigrations --noinput || echo "No new migrations needed"
 python manage.py migrate
 
-echo "### Компиляция переводов ###"
+echo "### Compiling translations ###"
 python manage.py compilemessages
 
-echo "### Проверка переводов ###"
-if [ -f "../locale/ru/LC_MESSAGES/django.mo" ]; then
+echo "### Verifying translations ###"
+if [ -f "locale/ru/LC_MESSAGES/django.mo" ]; then
     echo "Russian translation found"
 else
     echo "WARNING: Russian translation not found!"
-    echo "Содержимое locale:"
-    ls -R ../locale
+    echo "Contents of locale directory:"
+    find locale -type f
 fi
 
-echo "### Сборка статических файлов ###"
+echo "### Collecting static files ###"
 python manage.py collectstatic --noinput --clear
 
-echo "### Сборка завершена успешно ###"
+echo "### Build completed successfully ###"

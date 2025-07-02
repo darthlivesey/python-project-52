@@ -1,1 +1,1 @@
-from config.base import *
+from config.base import *  # noqa: F403, F401

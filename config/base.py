@@ -2,6 +2,7 @@ import os
 import sys
 import dj_database_url
 from dotenv import load_dotenv
+from pathlib import Path
 from django.utils.translation import gettext as _
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent

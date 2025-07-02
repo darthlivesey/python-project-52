@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
-from task_manager import views
+from .tasks import views
 from django.conf.urls.i18n import i18n_patterns
 
 urlpatterns = [

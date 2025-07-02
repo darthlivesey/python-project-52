@@ -3,8 +3,8 @@ exclude =
     .venv,
     __pycache__,
     migrations,
-    config/base.py,
-    wsgi.py
+    task_manager/settings.py,
+    task_manager/wsgi.py
 max-line-length = 120
 ignore = 
     E501,

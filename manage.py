@@ -3,17 +3,14 @@ import os
 import sys
 
 def setup_venv():
-    # Получаем базовый путь
     base_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.dirname(base_dir)
     venv_path = os.path.join(project_root, '.venv')
     
-    # Проверяем существование виртуального окружения
     if not os.path.exists(venv_path):
         print(f"Virtual environment not found at {venv_path}")
         return
     
-    # Добавляем site-packages в sys.path
     site_packages = os.path.join(
         venv_path, 
         'lib', 
@@ -27,7 +24,6 @@ def setup_venv():
     else:
         print(f"Site packages not found at {site_packages}")
     
-    # Добавляем bin в PATH
     bin_path = os.path.join(venv_path, 'bin')
     if os.path.exists(bin_path):
         os.environ['PATH'] = bin_path + os.pathsep + os.environ.get('PATH', '')
@@ -36,7 +32,7 @@ def setup_venv():
 def main():
     setup_venv()
     
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.base")
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'task_manager.settings')
     
     try:
         from django.core.management import execute_from_command_line

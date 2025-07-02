@@ -4,7 +4,7 @@ from django.utils.translation import activate
 from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.utils import translation
-from task_manager.models import Status, Task, Label
+from task_manager.tasks.models import Status, Task, Label
 
 
 User = get_user_model()
@@ -21,6 +21,7 @@ class BaseTestCase(TestCase):
     def tearDown(self):
         translation.deactivate()
         super().tearDown()
+
 
 class LocalizationTest(BaseTestCase):
     def test_russian_translation(self):
@@ -262,7 +263,6 @@ class LabelViewsTest(BaseTestCase):
         self.assertEqual(self.label.name, 'Updated Label')
 
     def test_label_create_invalid(self):
-        from django.utils.translation import activate
         activate('en')
         self.client.login(username='testuser', password='testpass')
         response = self.client.post(reverse('label_create'), {'name': ''})

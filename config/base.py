@@ -4,6 +4,9 @@ import dj_database_url
 from dotenv import load_dotenv
 from django.utils.translation import gettext as _
 
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, BASE_DIR)

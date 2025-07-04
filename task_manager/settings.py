@@ -185,13 +185,3 @@ if TESTING:
 
 print("\n" + "="*50)
 print(f"LOCALE_PATHS: {LOCALE_PATHS}")
-
-if 'test' in sys.argv:
-    MIGRATION_MODULES = {
-        'tasks': None,
-    }
-    TEST_RUNNER = 'django.test.runner.DiscoverRunner'
-    DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ':memory:',
-    }

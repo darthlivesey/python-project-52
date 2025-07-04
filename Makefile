@@ -1,20 +1,21 @@
 .PHONY: install build render-start migrate collectstatic test lint coverage prepare-hexlet start-server
 
 install:
-	uv sync
+	uv pip install -e .
 
 migrate:
 	uv run python3 manage.py migrate
 
 run:
-	uv run manage.py runserver 0.0.0.0:8000
+	uv run manage.py runserver
 
 test:
 	python manage.py test task_manager.tests --verbosity=2
 
 coverage:
-	uv run coverage run --source='.' manage.py test
-	uv run coverage xml
+	coverage run --source='.' manage.py test task_manager.tests
+	coverage report
+	coverage xml
 
 makemessages:
 	uv run django-admin makemessages --ignore="static" --ignore=".env"  -l ru
@@ -37,4 +38,6 @@ lint:
 format-app:
 	uv run ruff check --fix task_manager
 
-check: test lint
+check:
+	ruff check .
+	python manage.py test task_manager.tests --verbosity=2

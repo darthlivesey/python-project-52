@@ -20,7 +20,11 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 TESTING = 'test' in sys.argv
 
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-default-key-for-dev')
+if TESTING:
+    SECRET_KEY = 'django-insecure-test-secret-key-for-ci'
+else:
+    SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-default-key-for-dev')
+    
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = [

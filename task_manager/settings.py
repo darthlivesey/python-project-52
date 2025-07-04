@@ -186,14 +186,12 @@ if TESTING:
 print("\n" + "="*50)
 print(f"LOCALE_PATHS: {LOCALE_PATHS}")
 
-# for path in LOCALE_PATHS:
-#     print(f"\nChecking: {path}")
-#     print(f"Exists: {os.path.exists(path)}")
-    
-#     if os.path.exists(path):
-#         po_path = os.path.join(path, 'ru/LC_MESSAGES/django.po')
-#         mo_path = os.path.join(path, 'ru/LC_MESSAGES/django.mo')
-#         print(f"Russian PO file exists: {os.path.exists(po_path)}")
-#         print(f"Russian MO file exists: {os.path.exists(mo_path)}")
-    
-# print("="*50 + "\n")
+if 'test' in sys.argv:
+    MIGRATION_MODULES = {
+        'tasks': None,
+    }
+    TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory:',
+    }

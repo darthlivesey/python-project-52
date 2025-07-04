@@ -10,7 +10,7 @@ run:
 	uv run manage.py runserver 0.0.0.0:8000
 
 test:
-	uv run python3 manage.py test
+	python manage.py test task_manager.tests --verbosity=2
 
 coverage:
 	uv run coverage run --source='.' manage.py test

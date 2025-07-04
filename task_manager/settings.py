@@ -91,7 +91,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'task_manager.wsgi.application'
 
-if DEBUG or TESTING:
+if os.getenv('CI') or DEBUG or TESTING or 'test' in sys.argv:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',

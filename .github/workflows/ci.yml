@@ -1,99 +1,44 @@
-name: CI Pipeline
+name: Python CI
 
 on:
   push:
-    branches: [ main ]
   pull_request:
-    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_USER: testuser
-          POSTGRES_PASSWORD: testpass
-          POSTGRES_DB: testdb
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+    env:
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      DEBUG: False
+      DATABASE_URL: sqlite:///db.sqlite3
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.10"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: 'pyproject.toml'
 
-    - name: Install Python dependencies
-      run: |
-        uv sync
+      - name: Install uv and project dependencies
+        run: |
+          pip install uv
+          make install
 
-    - name: Install SonarScanner
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y openjdk-17-jre
-        SONAR_SCANNER_VERSION="5.0.1.3006"
-        wget "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux.zip"
-        unzip "sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux.zip"
-        sudo mv "sonar-scanner-${SONAR_SCANNER_VERSION}-linux" /opt/sonar-scanner
-        echo "/opt/sonar-scanner/bin" >> $GITHUB_PATH
+      - name: Run linter and tests
+        run: |
+          make check
 
-    - name: Run migrations
-      env:
-        DATABASE_URL: postgres://testuser:testpass@localhost:5432/testdb
-        SECRET_KEY: testsecret
-      run: |
-        python manage.py migrate
+      - name: Run test coverage
+        run: |
+          make testcov
 
-    - name: Run linter
-      run: uv run ruff check task_manager
-
-    - name: Run tests
-      env:
-        DATABASE_URL: postgres://testuser:testpass@localhost:5432/testdb
-        SECRET_KEY: testsecret
-        DEBUG: "False"
-        DJANGO_SETTINGS_MODULE: task_manager.settings
-      run: |
-        export PYTHONPATH=$PWD
-        python manage.py test task_manager.tests --verbosity=2
-
-    - name: Generate coverage report
-      env:
-        DATABASE_URL: postgres://testuser:testpass@localhost:5432/testdb
-        DJANGO_SETTINGS_MODULE: task_manager.settings
-      run: |
-        coverage run --source='task_manager' manage.py test task_manager.tests
-        coverage xml -i
-
-    - name: Verify sonar-project.properties
-      run: |
-        echo "Updating sonar-project.properties..."
-        echo 'sonar.projectKey=darthlivesey_python-project-52' > sonar-project.properties
-        echo 'sonar.organization=darthlivesey' >> sonar-project.properties
-        echo 'sonar.projectName=Python Project 52' >> sonar-project.properties
-        echo 'sonar.sources=task_manager' >> sonar-project.properties
-        echo 'sonar.tests=task_manager/tests' >> sonar-project.properties
-        echo 'sonar.sourceEncoding=UTF-8' >> sonar-project.properties
-        echo 'sonar.python.coverage.reportPaths=coverage.xml' >> sonar-project.properties
-        echo 'sonar.exclusions=**/.venv/**,**/staticfiles/**,**/__pycache__/**,**/tests/**' >> sonar-project.properties
-        echo 'sonar.language=py' >> sonar-project.properties
-        echo 'sonar.python.version=3.10' >> sonar-project.properties
-
-    - name: Run SonarScanner
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: |
-        sonar-scanner \
-          -Dsonar.host.url=https://sonarcloud.io \
-          -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-          -Dsonar.verbose=true
+      - name: SonarQubeScan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=darthlivesey_python-project-52
+            -Dsonar.organization=darthlivesey
+            -Dsonar.python.coverage.reportPaths=coverage.xml

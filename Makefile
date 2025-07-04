@@ -1,24 +1,23 @@
-.PHONY: install build render-start migrate collectstatic test lint coverage prepare-hexlet start-server
+.PHONY: install migrate start test testcov makemessages compilemessages collectstatic build render-start lint format-app check
 
 install:
-	uv pip install -e .
+	uv sync
 
 migrate:
 	uv run python3 manage.py migrate
 
-run:
-	uv run manage.py runserver
+start:
+	uv run manage.py runserver 0.0.0.0:8000
 
 test:
-	python manage.py test task_manager.tests --verbosity=2
+	uv run python3 manage.py test
 
-coverage:
-	coverage run --source='.' manage.py test task_manager.tests
-	coverage report
-	coverage xml
+testcov:
+	uv run coverage run --source='.' manage.py test
+	uv run coverage xml
 
 makemessages:
-	uv run django-admin makemessages --ignore="static" --ignore=".env"  -l ru
+	uv run django-admin makemessages --ignore="static" --ignore=".env" -l ru
 
 compilemessages:
 	uv run django-admin compilemessages
@@ -30,7 +29,7 @@ build:
 	./build.sh
 
 render-start:
-	gunicorn task_manager.config.wsgi:application
+	gunicorn task_manager.wsgi:application
 
 lint:
 	uv run ruff check task_manager
@@ -38,6 +37,4 @@ lint:
 format-app:
 	uv run ruff check --fix task_manager
 
-check:
-	ruff check .
-	python manage.py test task_manager.tests --verbosity=2
+check: test lint

@@ -23,7 +23,11 @@ jobs:
       - name: Install uv and project dependencies
         run: |
           pip install uv
-          make install
+          uv sync  # Используем uv sync вместо make install
+
+      - name: Apply migrations
+        run: |
+          uv run python3 manage.py migrate
 
       - name: Run linter and tests
         run: |
@@ -31,7 +35,8 @@ jobs:
 
       - name: Run test coverage
         run: |
-          make coverage
+          uv run coverage run --source='.' manage.py test
+          uv run coverage xml
 
       - name: SonarQubeScan
         uses: SonarSource/sonarqube-scan-action@v5

@@ -34,7 +34,6 @@ if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 INSTALLED_APPS = [
-    'task_manager.tasks',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,6 +43,7 @@ INSTALLED_APPS = [
     'django_filters',
     'whitenoise.runserver_nostatic',
     'django_bootstrap5',
+    'task_manager.tasks',
 ]
 
 AUTH_USER_MODEL = 'tasks.User'

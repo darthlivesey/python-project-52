@@ -13,6 +13,7 @@ class User(AbstractUser):
         return self.username
     
     class Meta:
+        db_table = 'tasks_user'  # Явное указание имени таблицы
         verbose_name = _("User")
         verbose_name_plural = _("Users")
 

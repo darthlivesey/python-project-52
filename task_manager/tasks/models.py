@@ -9,11 +9,9 @@ class User(AbstractUser):
         verbose_name=_("Creation date")
     )
     
-    def __str__(self):
-        return self.username
-    
     class Meta:
-        db_table = 'tasks_user'  # Явное указание имени таблицы
+        db_table = 'tasks_user'
+        app_label = 'tasks'
         verbose_name = _("User")
         verbose_name_plural = _("Users")
 

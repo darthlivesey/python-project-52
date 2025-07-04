@@ -31,7 +31,7 @@ jobs:
 
       - name: Run test coverage
         run: |
-          make testcov
+          make coverage
 
       - name: SonarQubeScan
         uses: SonarSource/sonarqube-scan-action@v5

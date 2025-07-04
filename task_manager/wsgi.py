@@ -1,6 +1,7 @@
 import os
 import sys
 from pathlib import Path
+
 from django.core.wsgi import get_wsgi_application
 
 project_root = Path(__file__).resolve().parent.parent.parent

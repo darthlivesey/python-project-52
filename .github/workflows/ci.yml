@@ -57,7 +57,7 @@ jobs:
         python manage.py migrate
 
     - name: Run linter
-      run: flake8 task_manager
+      run: uv run ruff check task_manager
 
     - name: Run tests
       env:
@@ -87,7 +87,6 @@ jobs:
         echo 'sonar.tests=task_manager/tests' >> sonar-project.properties
         echo 'sonar.sourceEncoding=UTF-8' >> sonar-project.properties
         echo 'sonar.python.coverage.reportPaths=coverage.xml' >> sonar-project.properties
-        # Исправление: добавлено исключение тестовых файлов
         echo 'sonar.exclusions=**/.venv/**,**/staticfiles/**,**/__pycache__/**,**/tests/**' >> sonar-project.properties
         echo 'sonar.language=py' >> sonar-project.properties
         echo 'sonar.python.version=3.10' >> sonar-project.properties

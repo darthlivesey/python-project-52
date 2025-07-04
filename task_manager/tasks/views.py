@@ -1,21 +1,30 @@
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
-from django.contrib.auth import logout
-from django.contrib.auth.views import LoginView
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib.messages.views import SuccessMessageMixin
-from django.urls import reverse_lazy
 from django.conf import settings
-from django.shortcuts import redirect
-from .forms import CustomUserCreationForm, CustomUserChangeForm
-from django.contrib.auth import get_user_model
 from django.contrib import messages
-from django.shortcuts import render
-from .models import Status, Task, Label
-from .forms import StatusForm, TaskForm, LabelForm
+from django.contrib.auth import get_user_model, logout
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.views import LoginView
+from django.contrib.messages.views import SuccessMessageMixin
+from django.shortcuts import redirect, render
+from django.urls import reverse_lazy
 from django.utils.translation import gettext as _
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    ListView,
+    UpdateView,
+)
 from django_filters.views import FilterView
-from .filters import TaskFilter
 
+from .filters import TaskFilter
+from .forms import (
+    CustomUserChangeForm,
+    CustomUserCreationForm,
+    LabelForm,
+    StatusForm,
+    TaskForm,
+)
+from .models import Label, Status, Task
 
 User = get_user_model()
 
@@ -67,7 +76,8 @@ class StatusDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     def post(self, request, *args, **kwargs):
         status = self.get_object()
         if status.task_set.exists():
-            messages.error(request, _("Невозможно удалить статус, используемый в задачах"))
+            messages.error(request, _("Невозможно удалить статус," 
+            " используемый в задачах"))
             return redirect('statuses_list')
         return super().post(request, *args, **kwargs)
 
@@ -91,7 +101,8 @@ class UserCreateView(SuccessMessageMixin, CreateView):
         return context
 
 
-class UserUpdateView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
+class UserUpdateView(LoginRequiredMixin, UserPassesTestMixin,
+                      SuccessMessageMixin, UpdateView):
     model = User
     form_class = CustomUserChangeForm
     template_name = 'users/user_form.html'
@@ -102,7 +113,8 @@ class UserUpdateView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixi
         return self.request.user == self.get_object()
 
 
-class UserDeleteView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, DeleteView):
+class UserDeleteView(LoginRequiredMixin, UserPassesTestMixin,
+                      SuccessMessageMixin, DeleteView):
     model = User
     template_name = 'users/user_confirm_delete.html'
     success_url = reverse_lazy('users_list')
@@ -159,7 +171,8 @@ class TaskUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
         return response
 
 
-class TaskDeleteView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, DeleteView):
+class TaskDeleteView(LoginRequiredMixin, UserPassesTestMixin,
+                      SuccessMessageMixin, DeleteView):
     model = Task
     template_name = 'tasks/task_confirm_delete.html'
     success_url = reverse_lazy('tasks_list')
@@ -195,7 +208,8 @@ class LabelUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     success_message = _("Метка успешно изменена")
 
 
-class LabelDeleteView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, DeleteView):
+class LabelDeleteView(LoginRequiredMixin, UserPassesTestMixin,
+                       SuccessMessageMixin, DeleteView):
     model = Label
     template_name = 'labels/label_confirm_delete.html'
     success_url = reverse_lazy('labels_list')
@@ -207,7 +221,8 @@ class LabelDeleteView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMix
     def post(self, request, *args, **kwargs):
         label = self.get_object()
         if label.tasks.exists():
-            messages.error(request, _("Невозможно удалить метку, используемую в задачах"))
+            messages.error(request, _("Невозможно удалить метку," 
+            " используемую в задачах"))
             return redirect('labels_list')
         return super().post(request, *args, **kwargs)
 

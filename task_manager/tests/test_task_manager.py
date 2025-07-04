@@ -1,11 +1,11 @@
-from django.test import TestCase, Client
-from django.urls import reverse
-from django.utils.translation import activate
-from django.contrib.auth import get_user_model
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.test import Client, TestCase
+from django.urls import reverse
 from django.utils import translation
-from task_manager.tasks.models import Status, Task, Label
+from django.utils.translation import activate
 
+from task_manager.tasks.models import Label, Status, Task
 
 User = get_user_model()
 
@@ -60,7 +60,8 @@ class UserViewsTest(TestCase):
 
     def test_user_update_view(self):
         self.client.login(username='testuser', password='testpassword123')
-        response = self.client.post(reverse('user_update', args=[self.user.pk]), {
+        response = self.client.post(reverse('user_update',
+                                             args=[self.user.pk]), {
             'username': 'updateduser',
             'first_name': 'Updated',
             'last_name': 'User',
@@ -94,7 +95,8 @@ class UserViewsTest(TestCase):
 class StatusViewsTest(TestCase):
     def setUp(self):
         self.client = Client()
-        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.user = User.objects.create_user(username='testuser',
+                                              password='testpass')
         self.status = Status.objects.create(name='Test Status')
 
     def test_status_list_requires_login(self):
@@ -106,7 +108,8 @@ class StatusViewsTest(TestCase):
 
     def test_status_create(self):
         self.client.login(username='testuser', password='testpass')
-        response = self.client.post(reverse('status_create'), {'name': 'New Status'})
+        response = self.client.post(reverse('status_create'),
+                                     {'name': 'New Status'})
         self.assertEqual(response.status_code, 302)
         self.assertTrue(Status.objects.filter(name='New Status').exists())
 
@@ -122,7 +125,8 @@ class StatusViewsTest(TestCase):
 
     def test_status_delete(self):
         self.client.login(username='testuser', password='testpass')
-        response = self.client.post(reverse('status_delete', args=[self.status.pk]))
+        response = self.client.post(reverse('status_delete',
+                                             args=[self.status.pk]))
         self.assertEqual(response.status_code, 302)
         self.assertFalse(Status.objects.filter(pk=self.status.pk).exists())
 
@@ -135,7 +139,8 @@ class StatusViewsTest(TestCase):
         )
 
         self.client.login(username='testuser', password='testpass')
-        response = self.client.post(reverse('status_delete', args=[self.status.pk]))
+        response = self.client.post(reverse('status_delete',
+                                             args=[self.status.pk]))
         self.assertEqual(response.status_code, 302)
         self.assertTrue(Status.objects.filter(pk=self.status.pk).exists())
         self.assertIn(
@@ -147,7 +152,8 @@ class StatusViewsTest(TestCase):
 class TaskViewsTest(TestCase):
     def setUp(self):
         self.client = Client()
-        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.user = User.objects.create_user(username='testuser',
+                                              password='testpass')
         self.status = Status.objects.create(name='Test Status')
         self.task = Task.objects.create(
             name='Test Task',
@@ -205,7 +211,8 @@ class TaskViewsTest(TestCase):
 class LabelViewsTest(BaseTestCase):
     def setUp(self):
         self.client = Client()
-        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.user = User.objects.create_user(username='testuser',
+                                              password='testpass')
         self.label = Label.objects.create(name='Test Label', creator=self.user)
         self.task = Task.objects.create(
             name='Test Task',
@@ -223,7 +230,8 @@ class LabelViewsTest(BaseTestCase):
 
     def test_label_create(self):
         self.client.login(username='testuser', password='testpass')
-        response = self.client.post(reverse('label_create'), {'name': 'New Label'})
+        response = self.client.post(reverse('label_create'),
+                                     {'name': 'New Label'})
         self.assertEqual(response.status_code, 302)
         self.assertTrue(Label.objects.filter(name='New Label').exists())
 
@@ -248,7 +256,8 @@ class LabelViewsTest(BaseTestCase):
 
     def test_label_delete_allowed(self):
         self.client.login(username='testuser', password='testpass')
-        response = self.client.post(reverse('label_delete', args=[self.label.pk]))
+        response = self.client.post(reverse('label_delete',
+                                             args=[self.label.pk]))
         self.assertEqual(response.status_code, 302)
         self.assertFalse(Label.objects.filter(pk=self.label.pk).exists())
 
@@ -280,7 +289,8 @@ class LabelViewsTest(BaseTestCase):
     def test_label_delete_no_permission(self):
         User.objects.create_user(username='another', password='testpass')
         self.client.login(username='another', password='testpass')
-        response = self.client.post(reverse('label_delete', args=[self.label.pk]))
+        response = self.client.post(reverse('label_delete',
+                                             args=[self.label.pk]))
         self.assertEqual(response.status_code, 403)
         self.assertTrue(Label.objects.filter(pk=self.label.pk).exists())
 

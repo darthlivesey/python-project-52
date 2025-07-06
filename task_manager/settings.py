@@ -192,3 +192,5 @@ if TESTING:
 
 print("\n" + "="*50)
 print(f"LOCALE_PATHS: {LOCALE_PATHS}")
+
+TEST_RUNNER = 'task_manager.test_runner.CustomTestRunner'

@@ -1,11 +1,11 @@
 import django_filters
 from django import forms
-from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
-from .models import Label, Status, Task
-
-User = get_user_model()
+from task_manager.labels.models import Label
+from task_manager.statuses.models import Status
+from task_manager.tasks.models import Task
+from task_manager.users.models import User
 
 
 class TaskFilter(django_filters.FilterSet):

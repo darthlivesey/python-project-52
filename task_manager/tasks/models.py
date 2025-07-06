@@ -1,65 +1,34 @@
-from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-
-class User(AbstractUser):
-    created_at = models.DateTimeField(auto_now_add=True,
-                                       verbose_name=_("Дата создания"))
-    
-    def __str__(self):
-        return self.username
-
-
-class Status(models.Model):
-    name = models.CharField(max_length=100, unique=True,
-                             verbose_name="Название")
-    created_at = models.DateTimeField(auto_now_add=True,
-                                       verbose_name="Дата создания")
-
-    def __str__(self):
-        return self.name
-
-
-class Label(models.Model):
-    name = models.CharField(max_length=100, unique=True,
-                             verbose_name="Название")
-    created_at = models.DateTimeField(auto_now_add=True,
-                                       verbose_name="Дата создания")
-    creator = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='created_labels',
-        verbose_name="Автор"
-    )
-
-    def __str__(self):
-        return self.name
+from task_manager.labels.models import Label
+from task_manager.statuses.models import Status
+from task_manager.users.models import User
 
 
 class Task(models.Model):
-    name = models.CharField(max_length=100, verbose_name="Название")
-    description = models.TextField(blank=True, verbose_name="Описание")
+    name = models.CharField(max_length=100, verbose_name=_("Название"))
+    description = models.TextField(blank=True, verbose_name=_("Описание"))
     status = models.ForeignKey(Status, on_delete=models.PROTECT,
-                                verbose_name="Статус")
+                               verbose_name=_("Статус"))
     creator = models.ForeignKey(User, on_delete=models.CASCADE,
-                                 related_name='created_tasks',
-                                   verbose_name="Автор")
+                                related_name='created_tasks',
+                                verbose_name=_("Автор"))
     executor = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name='assigned_tasks',
-        verbose_name="Исполнитель"
+        verbose_name=_("Исполнитель")
     )
     created_at = models.DateTimeField(auto_now_add=True,
-                                       verbose_name="Дата создания")
+                                      verbose_name=_("Дата создания"))
     labels = models.ManyToManyField(
         Label,
         blank=True,
         related_name='tasks',
-        verbose_name="Метки"
+        verbose_name=_("Метки")
     )
 
     def __str__(self):

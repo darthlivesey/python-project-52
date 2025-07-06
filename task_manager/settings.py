@@ -47,10 +47,13 @@ INSTALLED_APPS = [
     'django_filters',
     'whitenoise.runserver_nostatic',
     'django_bootstrap5',
-    'task_manager.tasks',
+    'task_manager.users',
+    'task_manager.statuses',
+    'task_manager.labels',
+    'task_manager.tasks', 
 ]
 
-AUTH_USER_MODEL = 'tasks.User'
+AUTH_USER_MODEL = 'users.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -87,7 +90,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.i18n',
-                'task_manager.tasks.context_processors.language_context',
+                'task_manager.users.context_processors.language_context',
             ],
         },
     },

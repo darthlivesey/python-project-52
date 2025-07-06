@@ -1,4 +1,3 @@
-# Python
 __pycache__/
 *.pyc
 *.pyo
@@ -22,9 +21,8 @@ venv.bak/
 *.log
 logs/
 
-.DS_Store
-Thumbs.db
-
 render.yaml
 
 code/__pycache__/
+
+.ruff_cache/

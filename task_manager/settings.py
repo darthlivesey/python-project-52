@@ -40,7 +40,6 @@ if RENDER_EXTERNAL_HOSTNAME:
 AUTH_USER_MODEL = 'users.User'
 
 INSTALLED_APPS = [
-    'task_manager.users',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -50,6 +49,7 @@ INSTALLED_APPS = [
     'django_filters',
     'whitenoise.runserver_nostatic',
     'django_bootstrap5',
+    'task_manager.users',
     'task_manager.statuses',
     'task_manager.labels',
     'task_manager.tasks', 
@@ -102,25 +102,8 @@ if os.getenv('CI') or DEBUG or TESTING or 'test' in sys.argv:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': ':memory:',
-            'TEST': {
-                'NAME': 'test_db.sqlite3',
-            }
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         }
-    }
-    PASSWORD_HASHERS = [
-        'django.contrib.auth.hashers.MD5PasswordHasher',
-    ]
-    
-    MIGRATION_MODULES = {
-        'auth': None,
-        'contenttypes': None,
-        'sessions': None,
-        'admin': None,
-        'users': 'task_manager.users.migrations',
-        'statuses': 'task_manager.statuses.migrations',
-        'labels': 'task_manager.labels.migrations',
-        'tasks': 'task_manager.tasks.migrations',
     }
 else:
     DATABASES = {

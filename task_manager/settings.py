@@ -40,6 +40,7 @@ if RENDER_EXTERNAL_HOSTNAME:
 AUTH_USER_MODEL = 'users.User'
 
 INSTALLED_APPS = [
+    'task_manager.users',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -49,7 +50,6 @@ INSTALLED_APPS = [
     'django_filters',
     'whitenoise.runserver_nostatic',
     'django_bootstrap5',
-    'task_manager.users',
     'task_manager.statuses',
     'task_manager.labels',
     'task_manager.tasks', 

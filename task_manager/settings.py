@@ -102,8 +102,25 @@ if os.getenv('CI') or DEBUG or TESTING or 'test' in sys.argv:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+            'NAME': ':memory:',
+            'TEST': {
+                'NAME': 'test_db.sqlite3',
+            }
         }
+    }
+    PASSWORD_HASHERS = [
+        'django.contrib.auth.hashers.MD5PasswordHasher',
+    ]
+    
+    MIGRATION_MODULES = {
+        'auth': None,
+        'contenttypes': None,
+        'sessions': None,
+        'admin': None,
+        'users': 'task_manager.users.migrations',
+        'statuses': 'task_manager.statuses.migrations',
+        'labels': 'task_manager.labels.migrations',
+        'tasks': 'task_manager.tasks.migrations',
     }
 else:
     DATABASES = {

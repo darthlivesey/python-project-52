@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'django_filters',
     'whitenoise.runserver_nostatic',
     'django_bootstrap5',
-    'task_manager.users',
+    'task_manager.users.apps.UsersConfig',
     'task_manager.statuses',
     'task_manager.labels',
     'task_manager.tasks', 

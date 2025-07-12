@@ -1,9 +1,9 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
-from django.utils.translation import gettext_lazy as _
 
 User = get_user_model()
+
 
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
@@ -16,6 +16,7 @@ class CustomUserCreationForm(UserCreationForm):
             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
         }
+
 
 class CustomUserChangeForm(UserChangeForm):
     class Meta:

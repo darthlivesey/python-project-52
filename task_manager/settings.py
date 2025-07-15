@@ -28,6 +28,7 @@ else:
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = [
+    'webserver',
     'hexlet-code-d230.onrender.com',
     'localhost',
     '127.0.0.1',

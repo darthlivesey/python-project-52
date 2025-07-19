@@ -23,3 +23,9 @@ lint:
 
 test:
 	uv run python manage.py test
+
+testcov:
+	uv run coverage run --source='.' manage.py test
+	uv run coverage xml
+
+check: test lint

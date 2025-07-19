@@ -1,9 +1,8 @@
-from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
-from django.shortcuts import render
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.utils.translation import gettext as _
 from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 from django_filters.views import FilterView
 
@@ -12,73 +11,56 @@ from .forms import TaskForm
 from .models import Task
 
 
-def debug_lang(request):
-    from django.utils import translation
-    info = {
-        "REQUEST_LANGUAGE": request.LANGUAGE_CODE,
-        "GET_LANGUAGE": translation.get_language(),
-        "SESSION_LANGUAGE": request.session.get('django_language', 'not set'),
-        "COOKIE_LANGUAGE": request.COOKIES.get('django_language', 'not set'),
-        "LOCALE_PATHS": settings.LOCALE_PATHS,
-    }
-    return render(request, 'debug.html', {'info': info})
+class TaskListView(LoginRequiredMixin, FilterView):
+    model = Task
+    context_object_name = 'tasks'
+    template_name = 'tasks/list.html'
+    filterset_class = TaskFilter
+    ordering = ['id']
 
-
-def index(request):
-    return render(request, 'index.html')
+    def get_filterset(self, filterset_class):
+        filterset = super().get_filterset(filterset_class)
+        filterset.request = self.request
+        return filterset
 
 
 class TaskCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Task
     form_class = TaskForm
-    template_name = 'tasks/task_form.html'
-    success_url = reverse_lazy('tasks_list')
-    success_message = _("Задача успешно создана")
+    template_name = 'tasks/create.html'
+    success_url = reverse_lazy('tasks:list')
+    success_message = "Задача успешно создана"
 
     def form_valid(self, form):
-        form.instance.creator = self.request.user
-        response = super().form_valid(form)
-        return response
-
-
-class TaskDetailView(LoginRequiredMixin, DetailView):
-    model = Task
-    template_name = 'tasks/task_detail.html'
-    context_object_name = 'task'
+        form.instance.author = self.request.user
+        return super().form_valid(form)
 
 
 class TaskUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Task
     form_class = TaskForm
-    template_name = 'tasks/task_form.html'
-    success_url = reverse_lazy('tasks_list')
-    success_message = _("Задача успешно изменена")
-
-    def form_valid(self, form):
-        form.instance.creator = self.request.user
-        response = super().form_valid(form)
-        return response
+    template_name = 'tasks/update.html'
+    success_url = reverse_lazy('tasks:list')
+    success_message = "Задача успешно изменена"
 
 
-class TaskDeleteView(LoginRequiredMixin, UserPassesTestMixin,
-                     SuccessMessageMixin, DeleteView):
+class TaskDeleteView(LoginRequiredMixin, SuccessMessageMixin,
+                     UserPassesTestMixin, DeleteView):
     model = Task
-    template_name = 'tasks/task_confirm_delete.html'
-    success_url = reverse_lazy('tasks_list')
-    success_message = _("Задача успешно удалена")
+    template_name = 'tasks/delete.html'
+    success_url = reverse_lazy('tasks:list')
+    success_message = "Задача успешно удалена"
 
     def test_func(self):
-        return self.request.user == self.get_object().creator
+        task = self.get_object()
+        return task.author == self.request.user
+
+    def handle_no_permission(self):
+        messages.error(self.request, "Задачу может удалить только ее автор")
+        return redirect('tasks:list')
 
 
-class TaskListView(LoginRequiredMixin, FilterView):
+class TaskDetailView(DetailView):
     model = Task
-    filterset_class = TaskFilter
-    template_name = 'tasks/task_list.html'
-    context_object_name = 'tasks'
-    paginate_by = 10
-
-    def get_filterset_kwargs(self, filterset_class):
-        kwargs = super().get_filterset_kwargs(filterset_class)
-        kwargs['request'] = self.request
-        return kwargs
+    template_name = 'tasks/detail.html'
+    context_object_name = 'task'

@@ -1,0 +1,10 @@
+{% extends "cud/delete.html" %}
+
+{% block title %}
+    <h2>Удаление метки</h2>
+    <p>Вы уверены, что хотите удалить {{ label.name }}</p>
+{% endblock %}
+
+{% block form_buttons %}
+    <a href="{% url 'labels:list' %}" class="btn btn-secondary">Назад</a>
+{% endblock %}

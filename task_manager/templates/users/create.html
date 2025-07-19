@@ -1,0 +1,10 @@
+{% extends "cud/create_update.html" %}
+{% load django_bootstrap5 %}
+
+{% block title %}
+  <h2 class="mb-4">Регистрация</h2>
+{% endblock %}
+
+{% block form_buttons %}
+    {% bootstrap_button "Зарегистрировать" button_type="submit" button_class="btn-primary w-100" %}
+{% endblock %}

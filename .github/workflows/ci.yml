@@ -21,29 +21,32 @@ jobs:
         with:
           python-version-file: 'pyproject.toml'
 
-      - name: Install uv and project dependencies
+      - name: Install dependencies
         run: |
           pip install uv
-          make install
+          uv pip install -e .
+
+      - name: Run migrations
+        run: |
+          python manage.py makemigrations
+          python manage.py migrate
 
       - name: Create static directory
         run: mkdir -p staticfiles
-        
-      - name: Collect static files
-        run: python manage.py collectstatic --noinput
-
-      - name: Apply migrations
-        run: make migrate
 
       - name: Run linter and tests
         run: |
-          make check
+          ruff check task_manager
+          python manage.py test
 
       - name: Run test coverage
         run: |
-          make testcov
+          pip install coverage
+          coverage run --source='.' manage.py test
+          coverage xml
 
       - name: SonarQubeScan
+        if: always()
         uses: SonarSource/sonarqube-scan-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

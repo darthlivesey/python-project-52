@@ -21,31 +21,36 @@ jobs:
         with:
           python-version-file: 'pyproject.toml'
 
-      - name: Install dependencies
+      - name: Create and activate virtual environment
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+
+      - name: Install uv and dependencies
         run: |
           pip install uv
-          uv pip install -e .
+          uv pip install -e .[dev]  # Установка с dev-зависимостями
 
       - name: Run migrations
         run: |
           python manage.py makemigrations
           python manage.py migrate
 
-      - name: Create static directory
-        run: mkdir -p staticfiles
-
-      - name: Run linter and tests
+      - name: Run tests
         run: |
-          ruff check task_manager
           python manage.py test
 
-      - name: Run test coverage
+      - name: Run linter
+        run: |
+          ruff check task_manager
+
+      - name: Generate coverage
         run: |
           pip install coverage
           coverage run --source='.' manage.py test
           coverage xml
 
-      - name: SonarQubeScan
+      - name: SonarQube Scan
         if: always()
         uses: SonarSource/sonarqube-scan-action@v5
         env:

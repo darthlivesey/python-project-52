@@ -8,9 +8,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY || 'dummy-secret-key-for-ci-12345' }}
       DEBUG: False
       DATABASE_URL: sqlite:///db.sqlite3
+      USE_SQLITE: True
 
     steps:
       - uses: actions/checkout@v4
@@ -24,6 +25,15 @@ jobs:
         run: |
           pip install uv
           make install
+
+      - name: Create static directory
+        run: mkdir -p staticfiles
+        
+      - name: Collect static files
+        run: python manage.py collectstatic --noinput
+
+      - name: Apply migrations
+        run: make migrate
 
       - name: Run linter and tests
         run: |
